@@ -12,7 +12,8 @@ public class ChatClient implements Runnable
     private ChatClientThread client    = null;
 
     public ChatClient(String serverName, int serverPort)
-    {  
+    {
+
         System.out.println("Establishing connection to server...");
         
         try
