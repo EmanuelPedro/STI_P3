@@ -1,4 +1,9 @@
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.security.auth.Subject;
+import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 import java.net.*;
 import java.io.*;
 
@@ -10,14 +15,30 @@ public class ChatClient implements Runnable
     private DataInputStream  console   = null;
     private DataOutputStream streamOut = null;
     private ChatClientThread client    = null;
+    private String username;
+    private SecretKey secretKey;
+    private Encryption encryption = null;
 
-    public ChatClient(String serverName, int serverPort)
-    {
-
+    public ChatClient(String serverName, int serverPort, String user) {
+        KeyGenerator keyGen = null;
         System.out.println("Establishing connection to server...");
         
         try
         {
+            username = user;
+            // gera chave secreta que serve para identificar cada utilizador.
+            try{
+                keyGen = KeyGenerator.getInstance("AES");
+                keyGen.init(128);
+            }
+
+            catch(Exception exp)
+            {
+                System.out.println(" Exception inside constructor " +exp);
+            }
+
+            secretKey = keyGen.generateKey();
+
             // Establishes connection with server (name and port)
             socket = new Socket(serverName, serverPort);
             System.out.println("Connected to server: " + socket);
@@ -35,17 +56,21 @@ public class ChatClient implements Runnable
             // Other error establishing connection
             System.out.println("Error establishing connection - unexpected exception: " + ioexception.getMessage()); 
         }
-        
+
    }
     
    public void run()
-   {  
+   {
+       String E_msg="";
        while (thread != null)
        {  
            try
-           {  
+           {
+               E_msg = console.readLine();
                // Sends message from console to server
-               streamOut.writeUTF(console.readLine());
+               System.out.println(">>> " + E_msg);
+               E_msg = encryption.encrypt(E_msg, secretKey);
+               streamOut.writeUTF(E_msg);
                streamOut.flush();
            }
          
@@ -59,7 +84,7 @@ public class ChatClient implements Runnable
     
     
     public void handle(String msg)
-    {  
+    {
         // Receives message from server
         if (msg.equals(".quit"))
         {  
@@ -67,9 +92,12 @@ public class ChatClient implements Runnable
             System.out.println("Exiting...Please press RETURN to exit ...");
             stop();
         }
-        else
+        else {
             // else, writes message received from server to console
-            System.out.println(msg);
+            String D_msg = encryption.decrypt(msg, secretKey);
+
+            System.out.println(D_msg);
+        }
     }
     
     // Inits new client thread
@@ -108,15 +136,15 @@ public class ChatClient implements Runnable
         }
    
     
-    public static void main(String args[])
-    {  
+    public static void main(String args[]) throws LoginException {
         ChatClient client = null;
-        if (args.length != 2)
+
+        if (args.length != 3)
             // Displays correct usage syntax on stdout
-            System.out.println("Usage: java ChatClient host port");
+            System.out.println("Usage: java ChatClient host port username");
         else
             // Calls new client
-            client = new ChatClient(args[0], Integer.parseInt(args[1]));
+            client = new ChatClient(args[0], Integer.parseInt(args[1]), args[2]);
     }
     
 }
