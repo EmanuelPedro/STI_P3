@@ -6,6 +6,10 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import java.net.*;
 import java.io.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
 
 
 public class ChatClient implements Runnable
@@ -16,64 +20,58 @@ public class ChatClient implements Runnable
     private DataOutputStream streamOut = null;
     private ChatClientThread client    = null;
     private String username;
-    private SecretKey secretKey;
+    //private String secretKey;
     private Encryption encryption = null;
 
     public ChatClient(String serverName, int serverPort, String user) {
-        KeyGenerator keyGen = null;
         System.out.println("Establishing connection to server...");
-        
+        username = user;
+
         try
         {
-            username = user;
-            // gera chave secreta que serve para identificar cada utilizador.
-            try{
-                keyGen = KeyGenerator.getInstance("AES");
-                keyGen.init(128);
-            }
-
-            catch(Exception exp)
-            {
-                System.out.println(" Exception inside constructor " +exp);
-            }
-
-            secretKey = keyGen.generateKey();
-
             // Establishes connection with server (name and port)
             socket = new Socket(serverName, serverPort);
             System.out.println("Connected to server: " + socket);
             start();
         }
-        
         catch(UnknownHostException uhe)
         {  
             // Host unkwnown
             System.out.println("Error establishing connection - host unknown: " + uhe.getMessage()); 
         }
-      
         catch(IOException ioexception)
         {  
             // Other error establishing connection
             System.out.println("Error establishing connection - unexpected exception: " + ioexception.getMessage()); 
         }
-
    }
     
    public void run()
    {
-       String E_msg="";
        while (thread != null)
        {  
            try
            {
-               E_msg = console.readLine();
-               // Sends message from console to server
-               System.out.println(">>> " + E_msg);
-               E_msg = encryption.encrypt(E_msg, secretKey);
-               streamOut.writeUTF(E_msg);
+               String plainTextMessage = console.readLine();
+                // Sends message from console to server
+               try {
+                   plainTextMessage = encryption.encrypt(plainTextMessage);
+                   streamOut.writeUTF(plainTextMessage);
+                   streamOut.writeUTF(encryption.signMessage(plainTextMessage));
+               } catch (NoSuchAlgorithmException e) {
+                   e.printStackTrace();
+               } catch (InvalidKeyException e) {
+                   e.printStackTrace();
+               } catch (SignatureException e) {
+                   e.printStackTrace();
+               } catch (NoSuchProviderException e) {
+                   e.printStackTrace();
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }
+
                streamOut.flush();
            }
-         
            catch(IOException ioexception)
            {  
                System.out.println("Error sending string to server: " + ioexception.getMessage());
@@ -83,31 +81,45 @@ public class ChatClient implements Runnable
     }
     
     
-    public void handle(String msg)
+    public void handle(String msg, String clientID, String signature, String publicKey)
     {
         // Receives message from server
-        if (msg.equals(".quit"))
-        {  
-            // Leaving, quit command
-            System.out.println("Exiting...Please press RETURN to exit ...");
-            stop();
-        }
-        else {
-            // else, writes message received from server to console
-            String D_msg = encryption.decrypt(msg, secretKey);
+        String encryptedMessage = "";
+        boolean isSigned;
 
-            System.out.println(D_msg);
+        try {
+            encryptedMessage = encryption.decrypt(clientID)+": "+ encryption.decrypt(msg);
+            isSigned = encryption.isSigned(encryption.getSendedPublicKey(publicKey), signature, msg);
+
+            if (!encryptedMessage.equals(".quit")) {
+                if (isSigned)
+                    System.out.println(encryptedMessage);
+                else
+                    System.out.println("Message not signed! ");
+            }
+            else
+            {
+                // Leaving, quit command
+                System.out.println("Exiting...Please press RETURN to exit ...");
+                stop();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     
     // Inits new client thread
     public void start() throws IOException
-    {  
+    {
+        encryption = new Encryption();
         console   = new DataInputStream(System.in);
         streamOut = new DataOutputStream(socket.getOutputStream());
+        streamOut.writeUTF(encryption.encoder.encodeToString(encryption.getPublicKey().getEncoded()));
+        streamOut.flush();
+
         if (thread == null)
         {  
-            client = new ChatClientThread(this, socket);
+            client = new ChatClientThread(this, socket, username);
             thread = new Thread(this);                   
             thread.start();
         }
@@ -136,7 +148,7 @@ public class ChatClient implements Runnable
         }
    
     
-    public static void main(String args[]) throws LoginException {
+    public static void main(String args[]) {
         ChatClient client = null;
 
         if (args.length != 3)
@@ -154,11 +166,15 @@ class ChatClientThread extends Thread
     private Socket           socket   = null;
     private ChatClient       client   = null;
     private DataInputStream  streamIn = null;
+    private String username           = null;
+    //private String secretKey          = null;
 
-    public ChatClientThread(ChatClient _client, Socket _socket)
+    public ChatClientThread(ChatClient _client, Socket _socket, String user)
     {  
         client   = _client;
         socket   = _socket;
+        username = user;
+        //this.secretKey = secret;
         open();  
         start();
     }
@@ -190,11 +206,16 @@ class ChatClientThread extends Thread
     }
     
     public void run()
-    {  
+    {
+        String message, signature, clientID, publicKey;
         while (true)
         {   try
-            {  
-                client.handle(streamIn.readUTF());
+            {
+                message = streamIn.readUTF();
+                clientID = streamIn.readUTF();
+                signature = streamIn.readUTF();
+                publicKey = streamIn.readUTF();
+                client.handle(message, clientID, signature, publicKey);
             }
             catch(IOException ioe)
             {  

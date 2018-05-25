@@ -1,6 +1,10 @@
 
 import java.net.*;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 
 
 public class ChatServer implements Runnable
@@ -9,6 +13,7 @@ public class ChatServer implements Runnable
 	private ServerSocket server_socket = null;
 	private Thread thread = null;
 	private int clientCount = 0;
+	private Encryption encryption = null;
 
 	public ChatServer(int port)
 	{
@@ -46,6 +51,7 @@ public class ChatServer implements Runnable
     
    	public void start()
 	{
+		encryption = new Encryption();
 		if (thread == null)
 		{
 			// Starts new thread for client
@@ -73,25 +79,28 @@ public class ChatServer implements Runnable
 		return -1;
 	}
 
-	public synchronized void handle(int ID, String input)
+	public synchronized void handle(int ID, String input, String signature, PublicKey publicKey)
 	{
-
-		if (input.equals(".quit"))
-			{
+		try {
+			System.out.println("Before decrypt " + input);
+			String decryptMessage = encryption.decrypt(input);
+			System.out.println("After decrypt " + decryptMessage);
+			if (decryptMessage.equals(".quit")) {
 				int leaving_id = findClient(ID);
 				// Client exits
 				clients[leaving_id].send(".quit");
 				// Notify remaing users
 				for (int i = 0; i < clientCount; i++)
-					if (i!=leaving_id)
-						clients[i].send("Client " +ID + " exits..");
+					if (i != leaving_id)
+						clients[i].send("Client " + ID + " exits..");
 				remove(ID);
-			}
-		else
-			// Brodcast message for every other client online
-			for (int i = 0; i < clientCount; i++)
-				clients[i].send(ID + ": " + input);
-
+			} else
+				// Brodcast message for every other client online
+				for (int i = 0; i < clientCount; i++)
+					clients[i].send(ID + ": " + decryptMessage);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
     
 	public synchronized void remove(int ID)
@@ -133,6 +142,7 @@ public class ChatServer implements Runnable
 			try
 			{
 				clients[clientCount].open();
+				clients[clientCount].getPublicKey();
 				clients[clientCount].start();
 				clientCount++;
 			}
@@ -144,7 +154,10 @@ public class ChatServer implements Runnable
 		else
 			System.out.println("Client refused: maximum " + clients.length + " reached.");
 	}
-    
+
+	public Encryption getEncryption() {
+		return encryption;
+	}
     
 	public static void main(String args[])
    	{  
@@ -167,6 +180,7 @@ class ChatServerThread extends Thread
     private int              ID        = -1;
     private DataInputStream  streamIn  =  null;
     private DataOutputStream streamOut = null;
+	private PublicKey publicKey		   = null;
 
    
     public ChatServerThread(ChatServer _server, Socket _socket)
@@ -204,12 +218,14 @@ class ChatServerThread extends Thread
     public void run()
     {  
         System.out.println("Server Thread " + ID + " running.");
+        String signature = null;
       
         while (true)
         {  
             try
-            {  
-                server.handle(ID, streamIn.readUTF());
+            {
+				signature = streamIn.readUTF();
+                server.handle(ID, streamIn.readUTF(), signature, publicKey);
             }
          
             catch(IOException ioe)
@@ -221,7 +237,27 @@ class ChatServerThread extends Thread
         }
     }
     
-    
+    public void getPublicKey()
+	{
+		try {
+			String pubKey = streamIn.readUTF();
+
+			publicKey = server.getEncryption().getSendedPublicKey(pubKey);
+			//String message = null;
+
+			//message = server.getEncryption().decrypt(streamIn.readUTF());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (InvalidKeySpecException e) {
+			e.printStackTrace();
+		} catch (NoSuchProviderException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
     // Opens thread
     public void open() throws IOException
     {  
