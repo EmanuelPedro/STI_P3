@@ -218,7 +218,7 @@ class ChatServerThread extends Thread
     public void run()
     {  
         System.out.println("Server Thread " + ID + " running.");
-        String signature = null;
+        String signature;
       
         while (true)
         {  

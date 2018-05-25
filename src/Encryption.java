@@ -8,20 +8,20 @@ import java.util.Base64;
 
 public class Encryption {
     private Cipher cipher = null;
-    private SecretKeySpec secretKeySpec = null;
+    private SecretKeySpec secretKeySpec;
     private String defaultPass = "PasswordForSTIP3";
     //private String defaultPass = "#Secr3tPassw0rd#";
     public Base64.Encoder encoder = null;
     public Base64.Decoder decoder = null;
-    private PrivateKey privateKey      = null;
-    private PublicKey publicKey        = null;
+    private PrivateKey privateKey = null;
+    private PublicKey publicKey = null;
 
     public Encryption()
     {
         KeyPairGenerator keyGen;
         KeyPair pair;
         byte[] key = defaultPass.getBytes();
-        this.secretKeySpec = new SecretKeySpec(key, "AES");
+        secretKeySpec = new SecretKeySpec(key, "AES");
         encoder = Base64.getEncoder();
         decoder = Base64.getDecoder();
         try {
@@ -30,6 +30,7 @@ public class Encryption {
             keyGen.initialize(1024);
             pair = keyGen.generateKeyPair();
             privateKey = pair.getPrivate();
+            System.out.println("Private key = " + privateKey);
             publicKey = pair.getPublic();
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
@@ -49,6 +50,9 @@ public class Encryption {
     }
 
     public String decrypt(String encryptedText) throws Exception {
+        System.out.println("Encrypt text= " + encryptedText);
+        System.out.println("Private key sign = " + privateKey);
+        System.out.println("Secretkey = " + secretKeySpec);
         byte[] encryptedTextByte = decoder.decode(encryptedText);
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
         byte[] decryptedByte = cipher.doFinal(encryptedTextByte);
@@ -58,6 +62,7 @@ public class Encryption {
 
     public String signMessage(String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         byte[] TextSigned, data = decoder.decode(plainText);
+        System.out.println("Private key sign = " + privateKey);
         Signature sign = Signature.getInstance("SHA1withDSA","SUN");
         sign.initSign(privateKey);
         sign.update(data,0,data.length);

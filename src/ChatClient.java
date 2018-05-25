@@ -56,8 +56,9 @@ public class ChatClient implements Runnable
                 // Sends message from console to server
                try {
                    plainTextMessage = encryption.encrypt(plainTextMessage);
+                   System.out.println(">> to send encrypt: " + plainTextMessage);
                    streamOut.writeUTF(plainTextMessage);
-                   streamOut.writeUTF(encryption.signMessage(plainTextMessage));
+                   //streamOut.writeUTF(encryption.signMessage(plainTextMessage));
                } catch (NoSuchAlgorithmException e) {
                    e.printStackTrace();
                } catch (InvalidKeyException e) {
