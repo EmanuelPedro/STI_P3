@@ -7,9 +7,5 @@ public class Main {
         ///stu
 
     }
-    public void cenas(int a , int b) {
 
-
-
-    }
 }
