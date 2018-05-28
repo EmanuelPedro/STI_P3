@@ -103,6 +103,7 @@ public class ChatClient implements Runnable
 
         } catch (Exception e) {
             e.printStackTrace();
+
         }
         //System.out.println("Message decrypted: " + decryptMessage);
 
