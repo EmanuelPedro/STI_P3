@@ -3,9 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="72222a56-08af-4d80-b299-06aedc5acac1" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Encryption.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Encryption.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -20,12 +17,10 @@
       <file leaf-file-name="Encryption.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Encryption.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-274">
-              <caret line="61" column="29" lean-forward="true" selection-start-line="61" selection-start-column="29" selection-end-line="61" selection-end-column="29" />
+            <state relative-caret-position="1309">
+              <caret line="83" column="21" selection-start-line="83" selection-start-column="21" selection-end-line="83" selection-end-column="21" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3939#3940#0" expanded="true" />
-                <element signature="e#3971#3972#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -34,8 +29,8 @@
       <file leaf-file-name="ChatClient.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="91" column="47" lean-forward="true" selection-start-line="91" selection-start-column="47" selection-end-line="91" selection-end-column="47" />
+            <state relative-caret-position="102">
+              <caret line="105" selection-start-line="105" selection-end-line="105" />
               <folding>
                 <element signature="method#ChatClient#0;class#ChatClient#0" />
                 <element signature="method#run#0;class#ChatClient#0" />
@@ -50,11 +45,20 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="misc.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.idea/misc.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" column="10" selection-start-line="5" selection-start-column="10" selection-end-line="5" selection-end-column="10" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ChatServer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="92" column="52" lean-forward="true" selection-start-line="92" selection-start-column="52" selection-end-line="92" selection-end-column="52" />
+            <state relative-caret-position="969">
+              <caret line="97" column="26" selection-start-line="97" selection-start-column="26" selection-end-line="97" selection-end-column="26" />
               <folding>
                 <element signature="method#run#0;class#ChatServer#0" />
                 <element signature="method#start#0;class#ChatServer#0" />
@@ -62,14 +66,10 @@
                 <element signature="method#findClient#0;class#ChatServer#0" />
                 <element signature="method#remove#0;class#ChatServer#0" />
                 <element signature="method#addThread#0;class#ChatServer#0" />
-                <element signature="e#3638#3639#0" expanded="true" />
-                <element signature="e#3661#3662#0" expanded="true" />
                 <element signature="method#main#0;class#ChatServer#0" />
                 <element signature="class#ChatServerThread#0" />
                 <element signature="method#ChatServerThread#0;class#ChatServerThread#0" />
                 <element signature="method#send#0;class#ChatServerThread#0" />
-                <element signature="e#4006#4007#0" expanded="true" />
-                <element signature="e#4022#4023#0" expanded="true" />
                 <element signature="method#run#0;class#ChatServerThread#0" />
                 <element signature="method#getPublicKey#0;class#ChatServerThread#0" />
                 <element signature="method#open#0;class#ChatServerThread#0" />
@@ -115,9 +115,10 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
-    <option name="width" value="977" />
-    <option name="height" value="1038" />
+    <option name="x" value="791" />
+    <option name="y" value="23" />
+    <option name="width" value="978" />
+    <option name="height" value="1039" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -125,8 +126,6 @@
     </navigator>
     <panes>
       <pane id="AndroidView" />
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -139,10 +138,24 @@
               <item name="STI_P3" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="STI_P3" type="b2602c69:ProjectViewProjectNode" />
+              <item name="STI_P3" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="sti" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="STI_P3" type="b2602c69:ProjectViewProjectNode" />
+              <item name="STI_P3" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="ChatClient.java" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -151,6 +164,116 @@
     <property name="last_opened_file_path" value="$USER_HOME$/Downloads/QCS/work2" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
+    <UpdatedFiles>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Updated from server" />
+        <option name="myStatusName" value="Changed on server" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="CHANGED_ON_SERVER" />
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated" />
+          <option name="myStatusName" value="Changed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UPDATED" />
+          <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/misc.xml</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Created" />
+          <option name="myStatusName" value="Created" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CREATED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Deleted" />
+          <option name="myStatusName" value="Deleted" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="true" />
+          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Restored" />
+          <option name="myStatusName" value="Will be restored" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="RESTORED" />
+        </FILE-GROUP>
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Modified" />
+        <option name="myStatusName" value="Modified" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MODIFIED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Skipped" />
+        <option name="myStatusName" value="Skipped" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SKIPPED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with conflicts" />
+        <option name="myStatusName" value="Will be merged with conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_CONFLICTS" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with tree conflicts" />
+        <option name="myStatusName" value="Merged with tree conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with property conflicts" />
+        <option name="myStatusName" value="Will be merged with property conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged" />
+        <option name="myStatusName" value="Will be merged" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Not in repository" />
+        <option name="myStatusName" value="Not in repository" />
+        <option name="mySupportsDeletion" value="true" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="UNKNOWN" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally added" />
+        <option name="myStatusName" value="Locally added" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_ADDED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally removed" />
+        <option name="myStatusName" value="Locally removed" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_REMOVED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Switched" />
+        <option name="myStatusName" value="Switched" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SWITCHED" />
+      </FILE-GROUP>
+    </UpdatedFiles>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -273,7 +396,8 @@
       <workItem from="1527206700930" duration="8974000" />
       <workItem from="1527264823166" duration="8586000" />
       <workItem from="1527348932089" duration="208000" />
-      <workItem from="1527453757627" duration="11481000" />
+      <workItem from="1527453757627" duration="12302000" />
+      <workItem from="1527517017778" duration="276000" />
     </task>
     <task id="LOCAL-00001" summary="TESTEDIDIER">
       <created>1527206739326</created>
@@ -296,11 +420,18 @@
       <option name="project" value="LOCAL" />
       <updated>1527266660652</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Tp esta devolta ao ponto antes de o ter apagado. &#10;mensagem passam assinadas, e manda para todos">
+      <created>1527472836584</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1527472836584</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="29249000" />
+    <option name="totallyTimeSpent" value="30346000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
@@ -308,32 +439,32 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.32478634" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.28490028" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32905984" />
+      <window_info anchor="bottom" id="Version Control" order="7" visible="true" weight="0.32905984" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.28490028" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" weight="0.19798657" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19798657" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="3" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32478634" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -372,7 +503,8 @@
     <MESSAGE value="TESTEDIDIER" />
     <MESSAGE value="TP quase completo" />
     <MESSAGE value="TP 25-05" />
-    <option name="LAST_COMMIT_MESSAGE" value="TP 25-05" />
+    <MESSAGE value="Tp esta devolta ao ponto antes de o ter apagado. &#10;mensagem passam assinadas, e manda para todos" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tp esta devolta ao ponto antes de o ter apagado. &#10;mensagem passam assinadas, e manda para todos" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -382,12 +514,60 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/Encryption.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1309">
+          <caret line="83" column="21" selection-start-line="83" selection-start-column="21" selection-end-line="83" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1649">
+          <caret line="97" column="26" lean-forward="true" selection-start-line="97" selection-start-column="26" selection-end-line="97" selection-end-column="26" />
+          <folding>
+            <element signature="method#run#0;class#ChatServer#0" />
+            <element signature="method#start#0;class#ChatServer#0" />
+            <element signature="method#stop#0;class#ChatServer#0" />
+            <element signature="method#findClient#0;class#ChatServer#0" />
+            <element signature="method#remove#0;class#ChatServer#0" />
+            <element signature="method#addThread#0;class#ChatServer#0" />
+            <element signature="method#main#0;class#ChatServer#0" />
+            <element signature="class#ChatServerThread#0" />
+            <element signature="method#ChatServerThread#0;class#ChatServerThread#0" />
+            <element signature="method#send#0;class#ChatServerThread#0" />
+            <element signature="method#run#0;class#ChatServerThread#0" />
+            <element signature="method#getPublicKey#0;class#ChatServerThread#0" />
+            <element signature="method#open#0;class#ChatServerThread#0" />
+            <element signature="method#close#0;class#ChatServerThread#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1700">
+          <caret line="100" column="13" lean-forward="true" selection-start-line="100" selection-start-column="13" selection-end-line="100" selection-end-column="13" />
+          <folding>
+            <element signature="method#ChatClient#0;class#ChatClient#0" />
+            <element signature="method#run#0;class#ChatClient#0" />
+            <element signature="method#start#0;class#ChatClient#0" />
+            <element signature="method#stop#0;class#ChatClient#0" />
+            <element signature="method#main#0;class#ChatClient#0" />
+            <element signature="method#ChatClientThread#0;class#ChatClientThread#0" />
+            <element signature="method#open#0;class#ChatClientThread#0" />
+            <element signature="method#close#0;class#ChatClientThread#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Encryption.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1054">
           <caret line="68" column="60" selection-start-line="68" selection-start-column="60" selection-end-line="68" selection-end-column="60" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3939#3940#0" expanded="true" />
-            <element signature="e#3971#3972#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -420,14 +600,10 @@
             <element signature="method#findClient#0;class#ChatServer#0" />
             <element signature="method#remove#0;class#ChatServer#0" />
             <element signature="method#addThread#0;class#ChatServer#0" />
-            <element signature="e#3638#3639#0" expanded="true" />
-            <element signature="e#3661#3662#0" expanded="true" />
             <element signature="method#main#0;class#ChatServer#0" />
             <element signature="class#ChatServerThread#0" />
             <element signature="method#ChatServerThread#0;class#ChatServerThread#0" />
             <element signature="method#send#0;class#ChatServerThread#0" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4022#4023#0" expanded="true" />
             <element signature="method#run#0;class#ChatServerThread#0" />
             <element signature="method#getPublicKey#0;class#ChatServerThread#0" />
             <element signature="method#open#0;class#ChatServerThread#0" />
@@ -442,8 +618,6 @@
           <caret line="68" column="60" selection-start-line="68" selection-start-column="60" selection-end-line="68" selection-end-column="60" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3939#3940#0" expanded="true" />
-            <element signature="e#3971#3972#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -476,14 +650,10 @@
             <element signature="method#findClient#0;class#ChatServer#0" />
             <element signature="method#remove#0;class#ChatServer#0" />
             <element signature="method#addThread#0;class#ChatServer#0" />
-            <element signature="e#3638#3639#0" expanded="true" />
-            <element signature="e#3661#3662#0" expanded="true" />
             <element signature="method#main#0;class#ChatServer#0" />
             <element signature="class#ChatServerThread#0" />
             <element signature="method#ChatServerThread#0;class#ChatServerThread#0" />
             <element signature="method#send#0;class#ChatServerThread#0" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4022#4023#0" expanded="true" />
             <element signature="method#run#0;class#ChatServerThread#0" />
             <element signature="method#getPublicKey#0;class#ChatServerThread#0" />
             <element signature="method#open#0;class#ChatServerThread#0" />
@@ -498,8 +668,6 @@
           <caret line="27" column="47" selection-start-line="27" selection-start-column="47" selection-end-line="27" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3939#3940#0" expanded="true" />
-            <element signature="e#3971#3972#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -532,14 +700,10 @@
             <element signature="method#findClient#0;class#ChatServer#0" />
             <element signature="method#remove#0;class#ChatServer#0" />
             <element signature="method#addThread#0;class#ChatServer#0" />
-            <element signature="e#3638#3639#0" expanded="true" />
-            <element signature="e#3661#3662#0" expanded="true" />
             <element signature="method#main#0;class#ChatServer#0" />
             <element signature="class#ChatServerThread#0" />
             <element signature="method#ChatServerThread#0;class#ChatServerThread#0" />
             <element signature="method#send#0;class#ChatServerThread#0" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4022#4023#0" expanded="true" />
             <element signature="method#run#0;class#ChatServerThread#0" />
             <element signature="method#getPublicKey#0;class#ChatServerThread#0" />
             <element signature="method#open#0;class#ChatServerThread#0" />
@@ -592,20 +756,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Encryption.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-274">
-          <caret line="61" column="29" lean-forward="true" selection-start-line="61" selection-start-column="29" selection-end-line="61" selection-end-column="29" />
+        <state relative-caret-position="1309">
+          <caret line="83" column="21" selection-start-line="83" selection-start-column="21" selection-end-line="83" selection-end-column="21" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3939#3940#0" expanded="true" />
-            <element signature="e#3971#3972#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="92" column="52" lean-forward="true" selection-start-line="92" selection-start-column="52" selection-end-line="92" selection-end-column="52" />
+        <state relative-caret-position="969">
+          <caret line="97" column="26" selection-start-line="97" selection-start-column="26" selection-end-line="97" selection-end-column="26" />
           <folding>
             <element signature="method#run#0;class#ChatServer#0" />
             <element signature="method#start#0;class#ChatServer#0" />
@@ -613,14 +775,10 @@
             <element signature="method#findClient#0;class#ChatServer#0" />
             <element signature="method#remove#0;class#ChatServer#0" />
             <element signature="method#addThread#0;class#ChatServer#0" />
-            <element signature="e#3638#3639#0" expanded="true" />
-            <element signature="e#3661#3662#0" expanded="true" />
             <element signature="method#main#0;class#ChatServer#0" />
             <element signature="class#ChatServerThread#0" />
             <element signature="method#ChatServerThread#0;class#ChatServerThread#0" />
             <element signature="method#send#0;class#ChatServerThread#0" />
-            <element signature="e#4006#4007#0" expanded="true" />
-            <element signature="e#4022#4023#0" expanded="true" />
             <element signature="method#run#0;class#ChatServerThread#0" />
             <element signature="method#getPublicKey#0;class#ChatServerThread#0" />
             <element signature="method#open#0;class#ChatServerThread#0" />
@@ -631,8 +789,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="91" column="47" lean-forward="true" selection-start-line="91" selection-start-column="47" selection-end-line="91" selection-end-column="47" />
+        <state relative-caret-position="17">
+          <caret line="100" column="13" selection-start-line="100" selection-start-column="13" selection-end-line="100" selection-end-column="13" />
           <folding>
             <element signature="method#ChatClient#0;class#ChatClient#0" />
             <element signature="method#run#0;class#ChatClient#0" />
@@ -645,6 +803,9 @@
           </folding>
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/misc.xml">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
   </component>
 </project>
