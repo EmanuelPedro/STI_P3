@@ -8,11 +8,10 @@ import java.util.Base64;
 
 public class Encryption {
     private Cipher cipher = null;
-    private SecretKeySpec secretKeySpec;
+    private SecretKeySpec secret;
     private String defaultPass = "PasswordForSTIP3";
-    //private String defaultPass = "#Secr3tPassw0rd#";
-    public Base64.Encoder encoder = null;
-    public Base64.Decoder decoder = null;
+    public Base64.Encoder encoder;
+    public Base64.Decoder decoder;
     private PrivateKey privateKey = null;
     private PublicKey publicKey = null;
 
@@ -20,17 +19,19 @@ public class Encryption {
     {
         KeyPairGenerator keyGen;
         KeyPair pair;
+        SecureRandom secureRandom;
         byte[] key = defaultPass.getBytes();
-        secretKeySpec = new SecretKeySpec(key, "AES");
+        secret = new SecretKeySpec(key, "AES");
         encoder = Base64.getEncoder();
         decoder = Base64.getDecoder();
         try {
             cipher = Cipher.getInstance("AES");
             keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
-            keyGen.initialize(1024);
+            secureRandom = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            keyGen.initialize(1024, secureRandom);
             pair = keyGen.generateKeyPair();
             privateKey = pair.getPrivate();
-            System.out.println("Private key = " + privateKey);
+            //System.out.println("Private key = " + privateKey);
             publicKey = pair.getPublic();
         } catch (NoSuchPaddingException e) {
             e.printStackTrace();
@@ -42,19 +43,23 @@ public class Encryption {
     }
 
     public String encrypt(String plainText) throws Exception {
+        //System.out.println("Entrei encrypt ");
         byte[] plainTextByte = plainText.getBytes();
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+        cipher.init(Cipher.ENCRYPT_MODE, secret);
         byte[] encryptedByte = cipher.doFinal(plainTextByte);
         String encryptedText = encoder.encodeToString(encryptedByte);
         return encryptedText;
     }
 
     public String decrypt(String encryptedText) throws Exception {
-        System.out.println("Encrypt text= " + encryptedText);
-        System.out.println("Private key sign = " + privateKey);
-        System.out.println("Secretkey = " + secretKeySpec);
-        byte[] encryptedTextByte = decoder.decode(encryptedText);
-        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+        //System.out.println("Entrei decrypt ");
+        //System.out.println("Encrypt text= " + encryptedText);
+        //System.out.println("Private key sign = " + privateKey);
+        //System.out.println("Secretkey = " + secret);
+
+        byte[] encryptedTextByte =decoder.decode(encryptedText);
+        cipher.init(Cipher.DECRYPT_MODE, secret);
+        //System.out.println("Length = " + cipher.doFinal(encryptedTextByte).length);
         byte[] decryptedByte = cipher.doFinal(encryptedTextByte);
         String decryptedText = new String(decryptedByte);
         return decryptedText;
@@ -62,7 +67,6 @@ public class Encryption {
 
     public String signMessage(String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         byte[] TextSigned, data = decoder.decode(plainText);
-        System.out.println("Private key sign = " + privateKey);
         Signature sign = Signature.getInstance("SHA1withDSA","SUN");
         sign.initSign(privateKey);
         sign.update(data,0,data.length);

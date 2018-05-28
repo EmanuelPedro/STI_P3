@@ -8,7 +8,7 @@ import java.security.spec.InvalidKeySpecException;
 
 
 public class ChatServer implements Runnable
-{  
+{
 	private ChatServerThread clients[] = new ChatServerThread[20];
 	private ServerSocket server_socket = null;
 	private Thread thread = null;
@@ -18,20 +18,20 @@ public class ChatServer implements Runnable
 	public ChatServer(int port)
 	{
 		try
-			{
-				// Binds to port and starts server
-				System.out.println("Binding to port " + port);
-				server_socket = new ServerSocket(port);
-				System.out.println("Server started: " + server_socket);
-				start();
-			}
-			catch(IOException ioexception)
-			{
-				// Error binding to port
-				System.out.println("Binding error (port=" + port + "): " + ioexception.getMessage());
-			}
+		{
+			// Binds to port and starts server
+			System.out.println("Binding to port " + port);
+			server_socket = new ServerSocket(port);
+			System.out.println("Server started: " + server_socket);
+			start();
+		}
+		catch(IOException ioexception)
+		{
+			// Error binding to port
+			System.out.println("Binding error (port=" + port + "): " + ioexception.getMessage());
+		}
 	}
-    
+
 	public void run()
 	{
 		while (thread != null)
@@ -48,8 +48,8 @@ public class ChatServer implements Runnable
 			}
 		}
 	}
-    
-   	public void start()
+
+	public void start()
 	{
 		encryption = new Encryption();
 		if (thread == null)
@@ -79,30 +79,42 @@ public class ChatServer implements Runnable
 		return -1;
 	}
 
-	public synchronized void handle(int ID, String input, String signature, PublicKey publicKey)
-	{
+	public synchronized void handle(int ID, String input, String signature, PublicKey publicKey) throws Exception {
+		String decryptMessage = null;
 		try {
-			System.out.println("Before decrypt " + input);
-			String decryptMessage = encryption.decrypt(input);
-			System.out.println("After decrypt " + decryptMessage);
+			decryptMessage = encryption.decrypt(input);
+
 			if (decryptMessage.equals(".quit")) {
 				int leaving_id = findClient(ID);
 				// Client exits
-				clients[leaving_id].send(".quit");
+
+				clients[leaving_id].send(Integer.toString(ID));
+				clients[leaving_id].send(encryption.encrypt(decryptMessage));
+				clients[leaving_id].send(signature);
+				clients[leaving_id].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
 				// Notify remaing users
 				for (int i = 0; i < clientCount; i++)
-					if (i != leaving_id)
-						clients[i].send("Client " + ID + " exits..");
+					if (i != leaving_id) {
+						clients[i].send(Integer.toString(ID));
+						clients[i].send(encryption.encrypt("Client " + ID + " exits.."));
+						clients[i].send(signature);
+						clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
+					}
 				remove(ID);
-			} else
+			} else {
 				// Brodcast message for every other client online
-				for (int i = 0; i < clientCount; i++)
-					clients[i].send(ID + ": " + decryptMessage);
+				for (int i = 0; i < clientCount; i++) {
+					clients[i].send(Integer.toString(ID));
+					clients[i].send(encryption.encrypt(decryptMessage));
+					clients[i].send(signature);
+					clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-    
+
 	public synchronized void remove(int ID)
 	{
 		int pos = findClient(ID);
@@ -114,7 +126,7 @@ public class ChatServer implements Runnable
 			System.out.println("Removing client thread " + ID + " at " + pos);
 			if (pos < clientCount-1)
 				for (int i = pos+1; i < clientCount; i++)
-						clients[i-1] = clients[i];
+					clients[i-1] = clients[i];
 			clientCount--;
 
 			try
@@ -158,9 +170,9 @@ public class ChatServer implements Runnable
 	public Encryption getEncryption() {
 		return encryption;
 	}
-    
+
 	public static void main(String args[])
-   	{  
+	{
 		ChatServer server = null;
 
 		if (args.length != 1)
@@ -174,106 +186,110 @@ public class ChatServer implements Runnable
 }
 
 class ChatServerThread extends Thread
-{  
-    private ChatServer       server    = null;
-    private Socket           socket    = null;
-    private int              ID        = -1;
-    private DataInputStream  streamIn  =  null;
-    private DataOutputStream streamOut = null;
+{
+	private ChatServer       server    = null;
+	private Socket           socket    = null;
+	private int              ID        = -1;
+	private DataInputStream  streamIn  =  null;
+	private DataOutputStream streamOut = null;
 	private PublicKey publicKey		   = null;
 
-   
-    public ChatServerThread(ChatServer _server, Socket _socket)
-    {  
-        super();
-        server = _server;
-        socket = _socket;
-        ID     = socket.getPort();
-    }
-    
-    // Sends message to client
-    public void send(String msg)
-    {   
-        try
-        {  
-            streamOut.writeUTF(msg);
-            streamOut.flush();
-        }
-       
-        catch(IOException ioexception)
-        {  
-            System.out.println(ID + " ERROR sending message: " + ioexception.getMessage());
-            server.remove(ID);
-            stop();
-        }
-    }
-    
-    // Gets id for client
-    public int getID()
-    {  
-        return ID;
-    }
-   
-    // Runs thread
-    public void run()
-    {  
-        System.out.println("Server Thread " + ID + " running.");
-        String signature;
-      
-        while (true)
-        {  
-            try
-            {
-				signature = streamIn.readUTF();
-                server.handle(ID, streamIn.readUTF(), signature, publicKey);
-            }
-         
-            catch(IOException ioe)
-            {  
-                System.out.println(ID + " ERROR reading: " + ioe.getMessage());
-                server.remove(ID);
-                stop();
-            }
-        }
-    }
-    
-    public void getPublicKey()
+
+	public ChatServerThread(ChatServer _server, Socket _socket)
 	{
+		super();
+		server = _server;
+		socket = _socket;
+		ID     = socket.getPort();
+	}
+
+	// Sends message to client
+	public void send(String msg)
+	{
+		try
+		{
+			streamOut.writeUTF(msg);
+			streamOut.flush();
+		}
+
+		catch(IOException ioexception)
+		{
+			System.out.println(ID + " ERROR sending message: " + ioexception.getMessage());
+			server.remove(ID);
+			stop();
+		}
+	}
+
+	// Gets id for client
+	public int getID()
+	{
+		return ID;
+	}
+
+	// Runs thread
+	public void run()
+	{
+		System.out.println("Server Thread " + ID + " running.");
+		String message, signature = null;
+
+		while (true)
+		{
+			try
+			{
+				message = streamIn.readUTF();
+				signature = streamIn.readUTF();
+
+				server.handle(ID, message, signature, publicKey);
+			}
+			catch(IOException ioe)
+			{
+				System.out.println(ID + " ERROR reading: " + ioe.getMessage());
+				server.remove(ID);
+				stop();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void getPublicKey()
+	{
+		String pubKey = null;
 		try {
-			String pubKey = streamIn.readUTF();
+			pubKey = streamIn.readUTF();
 
 			publicKey = server.getEncryption().getSendedPublicKey(pubKey);
-			//String message = null;
 
-			//message = server.getEncryption().decrypt(streamIn.readUTF());
+			streamOut.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
 		} catch (NoSuchProviderException e) {
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (InvalidKeySpecException e) {
 			e.printStackTrace();
 		}
+
+
 	}
-    // Opens thread
-    public void open() throws IOException
-    {  
-        streamIn = new DataInputStream(new 
-                        BufferedInputStream(socket.getInputStream()));
-        streamOut = new DataOutputStream(new
-                        BufferedOutputStream(socket.getOutputStream()));
-    }
-    
-    // Closes thread
-    public void close() throws IOException
-    {  
-        if (socket != null)    socket.close();
-        if (streamIn != null)  streamIn.close();
-        if (streamOut != null) streamOut.close();
-    }
-    
+
+	// Opens thread
+	public void open() throws IOException
+	{
+		streamIn = new DataInputStream(new
+				BufferedInputStream(socket.getInputStream()));
+		streamOut = new DataOutputStream(new
+				BufferedOutputStream(socket.getOutputStream()));
+	}
+
+	// Closes thread
+	public void close() throws IOException
+	{
+		if (socket != null)    socket.close();
+		if (streamIn != null)  streamIn.close();
+		if (streamOut != null) streamOut.close();
+	}
+
 }
 
