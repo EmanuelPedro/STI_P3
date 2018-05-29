@@ -1,9 +1,15 @@
 
+import javax.crypto.spec.SecretKeySpec;
 import java.net.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 
 
@@ -14,8 +20,71 @@ public class ChatServer implements Runnable
 	private Thread thread = null;
 	private int clientCount = 0;
 	private Encryption encryption = null;
+	private X509Certificate caCertificate;
+	private KeyStore keystore;
+	private String servercertname;
+	private String keystorealias;
+	private String keystorepass;
 
-	public ChatServer(int port)
+	private X509Certificate loadCert(String pathToCert){
+		CertificateFactory cf = null;
+		try {
+			cf = CertificateFactory.getInstance("X.509");
+			FileInputStream finStream = null;
+			try {
+				finStream = new FileInputStream(pathToCert);
+			} catch (FileNotFoundException e) {
+				System.out.println("File not found.");
+				System.exit(0);
+			}
+			X509Certificate loadedCertificate = (X509Certificate)cf.generateCertificate(finStream);
+			return loadedCertificate;
+		} catch (CertificateException e){
+			System.out.println("Certificate error.");
+			return null;
+		}
+	}
+
+	private KeyStore loadKeystore(String pathToKeyStore, String password){
+		FileInputStream is = null;
+		try {
+			is = new FileInputStream(pathToKeyStore);
+		} catch (FileNotFoundException e) {
+			System.out.println("Keystore not found");
+			System.exit(0);
+		}
+		KeyStore keystore = null;
+		try {
+			keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			keystore.load(is, password.toCharArray());
+			return keystore;
+		} catch (Exception e) {
+			System.out.println("Error loading keystore (invalid password?)");
+			System.exit(0);
+			return null;
+		}
+	}
+
+	public boolean isValid(X509Certificate unvalidatedCertificate) {
+		if (unvalidatedCertificate == null) {
+			System.out.println("Null certificate");
+			return false;
+		}
+		if (unvalidatedCertificate.equals(caCertificate)) {
+			System.out.println("CA Certificate");
+			return true;
+		}
+		try {
+			unvalidatedCertificate.verify(caCertificate.getPublicKey());
+			unvalidatedCertificate.checkValidity();
+			return true;
+		} catch(Exception e){
+			System.out.println("Certificate not valid or expired.");
+			return false;
+		}
+	}
+
+	public ChatServer(int port, String servercertname, String keystorefilename, String keystorepassword, String keystorealias, String cacertname)
 	{
 		try
 		{
@@ -23,6 +92,24 @@ public class ChatServer implements Runnable
 			System.out.println("Binding to port " + port);
 			server_socket = new ServerSocket(port);
 			System.out.println("Server started: " + server_socket);
+
+			caCertificate = loadCert(cacertname);
+			System.out.println("Loaded CA Certificate");
+			//System.out.println("keystorefilename = " + keystorefilename);
+			//System.out.println("keystorepass = " + keystorepassword);
+			//InputStream f = new FileInputStream("C:\\Users\\tripe\\Desktop\\2017_2018\\STI\\STI_P3\\server.keystore");
+			keystore = loadKeystore("C:\\Users\\tripe\\Desktop\\2017_2018\\STI\\STI_P3\\server.keystore","sti_tp3");
+
+			System.out.println("Loaded KeyStore");
+
+			this.servercertname = servercertname;
+			this.keystorealias = keystorealias;
+			this.keystorepass = keystorepassword;
+
+			//System.out.println("servercertname = " + keystorefilename);
+			//System.out.println("keystorealias = " + keystorepassword);
+
+
 			start();
 		}
 		catch(IOException ioexception)
@@ -51,7 +138,6 @@ public class ChatServer implements Runnable
 
 	public void start()
 	{
-		encryption = new Encryption();
 		if (thread == null)
 		{
 			// Starts new thread for client
@@ -79,9 +165,38 @@ public class ChatServer implements Runnable
 		return -1;
 	}
 
-	public synchronized void handle(int ID, String input, String signature, PublicKey publicKey) throws Exception {
+	public synchronized void handle(int ID, String input) throws Exception {
 		String decryptMessage = null;
+		encryption = new Encryption();
 		try {
+			int leaving_id = findClient(ID);
+			String clientCert = new String(input);
+			boolean certReceived = clients[leaving_id].updateCertificate(clientCert);
+			//print isCertValid
+			if (certReceived)
+				System.out.println("cert received");
+			else
+				System.out.println("Cert not received");
+			boolean isCertValid = isValid(clients[leaving_id].getClientCertificate());
+			if (isCertValid)
+				System.out.println("cert valid");
+			else
+				System.out.println("Cert not valid");
+
+			byte[] decryptWithPrivateKey;
+			decryptWithPrivateKey = encryption.decrypt2(input.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()));
+
+			clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
+
+			//set client secretKey
+			SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
+			clients[leaving_id].setSecretKey(secretKey);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		/*try {
 			decryptMessage = encryption.decrypt(input);
 
 			if (decryptMessage.equals(".quit")) {
@@ -112,7 +227,7 @@ public class ChatServer implements Runnable
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 	public synchronized void remove(int ID)
@@ -154,7 +269,6 @@ public class ChatServer implements Runnable
 			try
 			{
 				clients[clientCount].open();
-				clients[clientCount].getPublicKey();
 				clients[clientCount].start();
 				clientCount++;
 			}
@@ -175,12 +289,12 @@ public class ChatServer implements Runnable
 	{
 		ChatServer server = null;
 
-		if (args.length != 1)
+		if (args.length != 6)
 			// Displays correct usage for server
-			System.out.println("Usage: java ChatServer port");
+			System.out.println("Usage: java ChatServer port certname keystore_file keystore_pass keystore_keys_alias cacert");
 		else
 			// Calls new server
-			server = new ChatServer(Integer.parseInt(args[0]));
+			server = new ChatServer(Integer.parseInt(args[0]), args[1], args[2], args[3], args[4], args[5]);
 	}
 
 }
@@ -192,7 +306,10 @@ class ChatServerThread extends Thread
 	private int              ID        = -1;
 	private DataInputStream  streamIn  =  null;
 	private DataOutputStream streamOut = null;
-	private PublicKey publicKey		   = null;
+	//private PublicKey publicKey		   = null;
+	private X509Certificate clientCertificate;
+	private SecretKeySpec secretKey;
+	private byte[] ClientSecretKey;
 
 
 	public ChatServerThread(ChatServer _server, Socket _socket)
@@ -226,20 +343,47 @@ class ChatServerThread extends Thread
 		return ID;
 	}
 
+	public SecretKeySpec getSecretKey() { return secretKey; }
+
+	public void setSecretKey(SecretKeySpec secretKey) { this.secretKey = secretKey; }
+
+	public X509Certificate getClientCertificate() { return clientCertificate; }
+
+	public byte[] getClientSecretKey() {
+		return ClientSecretKey;
+	}
+
+	public void setClientSecretKey(byte[] secretKeyRAW) {
+		this.ClientSecretKey = secretKeyRAW;
+	}
+
+	public boolean updateCertificate(String certificateString){
+		CertificateFactory cf = null;
+		try {
+			cf = CertificateFactory.getInstance("X.509");
+			InputStream finStream = null;
+			finStream = new ByteArrayInputStream(certificateString.getBytes(StandardCharsets.UTF_8));
+			clientCertificate = (X509Certificate)cf.generateCertificate(finStream);
+			return true;
+		} catch (CertificateException e){
+			System.out.println("Certificate error.");
+			return false;
+		}
+	}
+
 	// Runs thread
 	public void run()
 	{
 		System.out.println("Server Thread " + ID + " running.");
-		String message, signature = null;
+		String message;
 
 		while (true)
 		{
 			try
 			{
 				message = streamIn.readUTF();
-				signature = streamIn.readUTF();
 
-				server.handle(ID, message, signature, publicKey);
+				server.handle(ID, message);
 			}
 			catch(IOException ioe)
 			{
@@ -252,7 +396,7 @@ class ChatServerThread extends Thread
 		}
 	}
 
-	public void getPublicKey()
+	/*public void getPublicKey()
 	{
 		String pubKey = null;
 		try {
@@ -272,15 +416,13 @@ class ChatServerThread extends Thread
 		}
 
 
-	}
+	}*/
 
 	// Opens thread
 	public void open() throws IOException
 	{
-		streamIn = new DataInputStream(new
-				BufferedInputStream(socket.getInputStream()));
-		streamOut = new DataOutputStream(new
-				BufferedOutputStream(socket.getOutputStream()));
+		streamIn = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+		streamOut = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 	}
 
 	// Closes thread
