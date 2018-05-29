@@ -98,7 +98,7 @@ public class ChatServer implements Runnable
 			//System.out.println("keystorefilename = " + keystorefilename);
 			//System.out.println("keystorepass = " + keystorepassword);
 			//InputStream f = new FileInputStream("C:\\Users\\tripe\\Desktop\\2017_2018\\STI\\STI_P3\\server.keystore");
-			keystore = loadKeystore("C:\\Users\\tripe\\Desktop\\2017_2018\\STI\\STI_P3\\server.keystore","sti_tp3");
+			keystore = loadKeystore(keystorefilename,"sti_tp3");
 
 			System.out.println("Loaded KeyStore");
 

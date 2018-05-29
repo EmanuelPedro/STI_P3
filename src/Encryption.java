@@ -81,7 +81,7 @@ public class Encryption {
         byte[] encryptedByte = new byte[200];
 
         try {
-            cipher = Cipher.getInstance("AES");
+            cipher = Cipher.getInstance(algorithm);
             if(algorithm.equals("AES")){
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters());
             }

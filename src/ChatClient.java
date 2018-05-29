@@ -159,7 +159,9 @@ public class ChatClient implements Runnable
 
 
 
-                //streamOut.write(encryptPublicKey);
+                streamOut.write(encryptPublicKey);
+                message = console.readLine();
+                streamOut.writeUTF(message);
                 streamOut.flush();
                 // 3. assinar mensagem
 
@@ -234,7 +236,7 @@ public class ChatClient implements Runnable
         console   = new DataInputStream(System.in);
         streamOut = new DataOutputStream(socket.getOutputStream());
         //streamOut.writeUTF(encryption.encoder.encodeToString(encryption.getPublicKey().getEncoded()));
-        streamOut.flush();
+        //streamOut.flush();
 
         if (thread == null)
         {
