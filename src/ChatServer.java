@@ -181,6 +181,7 @@ public class ChatServer implements Runnable
 			String s = new String(publicKey,StandardCharsets.UTF_8);
 			System.out.println("PUBKEY = " + s);
 
+
 			try{
 				decryptWithPrivateKey = encryption.decrypt2(publicKey, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
 				System.out.println("\n \n STUFF \n \n");
