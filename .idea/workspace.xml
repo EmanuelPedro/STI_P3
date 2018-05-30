@@ -4,7 +4,7 @@
     <list default="true" id="37e0df82-0cdd-49b0-ad3e-c85308a315fe" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Encryption.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Encryption.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatServer.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,20 +16,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ChatClient.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ChatClient.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="164" column="34" selection-start-line="164" selection-start-column="34" selection-end-line="164" selection-end-column="34" />
+            <state relative-caret-position="655">
+              <caret line="155" column="38" lean-forward="true" selection-start-line="155" selection-start-column="38" selection-end-line="155" selection-end-column="38" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ChatServer.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="String.java" pinned="false" current-in-tab="false">
+        <entry file="jar://C:/Program Files/Java/jdk-10.0.1/lib/src.zip!/java.base/java/lang/String.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="979" selection-start-line="979" selection-end-line="979" />
+              <folding>
+                <element signature="e#37780#37781#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ChatServer.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1317">
-              <caret line="368" column="21" selection-start-line="368" selection-start-column="16" selection-end-line="368" selection-end-column="21" />
+            <state relative-caret-position="102">
+              <caret line="180" column="12" selection-start-line="180" selection-start-column="12" selection-end-line="180" selection-end-column="12" />
               <folding>
                 <element signature="e#8993#8994#0" expanded="true" />
                 <element signature="e#9009#9010#0" expanded="true" />
@@ -65,8 +77,9 @@
       <find>listenin</find>
       <find>listen</find>
       <find>run()</find>
-      <find>run</find>
       <find>aes</find>
+      <find>handle</find>
+      <find>run</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -75,9 +88,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/ChatServer.java" />
         <option value="$PROJECT_DIR$/src/Encryption.java" />
         <option value="$PROJECT_DIR$/src/ChatClient.java" />
+        <option value="$PROJECT_DIR$/src/ChatServer.java" />
       </list>
     </option>
   </component>
@@ -90,7 +103,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
     <option name="width" value="697" />
     <option name="height" value="735" />
@@ -254,7 +267,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.ChatServer">
+  <component name="RunManager" selected="Application.ChatClient">
     <configuration name="ChatClient" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ChatClient" />
       <module name="STI_P3" />
@@ -348,7 +361,7 @@
       <workItem from="1527267443374" duration="2772000" />
       <workItem from="1527506719134" duration="598000" />
       <workItem from="1527517163771" duration="1567000" />
-      <workItem from="1527596850276" duration="9516000" />
+      <workItem from="1527596850276" duration="12394000" />
     </task>
     <task id="LOCAL-00001" summary="enunciado">
       <created>1527268365871</created>
@@ -364,26 +377,33 @@
       <option name="project" value="LOCAL" />
       <updated>1527268431253</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="alterações no run do client">
+      <created>1527681081762</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1527681081762</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14453000" />
+    <option name="totallyTimeSpent" value="17331000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="697" height="735" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Messages" order="7" sideWeight="0.49546143" weight="0.41419142" />
+      <window_info anchor="bottom" id="Messages" order="7" sideWeight="0.49546143" weight="0.4108911" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info id="Image Layers" order="2" />
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.50549453" side_tool="true" weight="0.360134" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4945055" weight="0.34818482" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4945055" visible="true" weight="0.35313532" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49848714" weight="0.32838285" />
       <window_info anchor="right" id="Mongo Explorer" order="3" />
       <window_info anchor="bottom" id="Terminal" order="7" />
@@ -396,7 +416,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="3" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49848714" weight="0.40536013" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49848714" weight="0.39933994" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -440,7 +460,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="enunciado" />
-    <option name="LAST_COMMIT_MESSAGE" value="enunciado" />
+    <MESSAGE value="alterações no run do client" />
+    <option name="LAST_COMMIT_MESSAGE" value="alterações no run do client" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -450,12 +471,6 @@
           <line>343</line>
           <properties />
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/ChatClient.java</url>
-          <line>144</line>
-          <properties />
-          <option name="timeStamp" value="9" />
         </line-breakpoint>
       </breakpoints>
       <option name="time" value="10" />
@@ -543,10 +558,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/Encryption.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="147">
+          <caret line="107" selection-start-line="107" selection-end-line="107" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk-10.0.1/lib/src.zip!/java.base/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="979" selection-start-line="979" selection-end-line="979" />
+          <folding>
+            <element signature="e#37780#37781#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="655">
+          <caret line="155" column="38" lean-forward="true" selection-start-line="155" selection-start-column="38" selection-end-line="155" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1317">
-          <caret line="368" column="21" selection-start-line="368" selection-start-column="16" selection-end-line="368" selection-end-column="21" />
+        <state relative-caret-position="102">
+          <caret line="180" column="12" selection-start-line="180" selection-start-column="12" selection-end-line="180" selection-end-column="12" />
           <folding>
             <element signature="e#8993#8994#0" expanded="true" />
             <element signature="e#9009#9010#0" expanded="true" />
@@ -555,20 +594,6 @@
             <element signature="e#9355#9356#0" expanded="true" />
             <element signature="e#9397#9398#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Encryption.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="107" selection-start-line="107" selection-end-line="107" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="164" column="34" selection-start-line="164" selection-start-column="34" selection-end-line="164" selection-end-column="34" />
         </state>
       </provider>
     </entry>

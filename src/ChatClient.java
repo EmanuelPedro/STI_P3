@@ -144,10 +144,9 @@ public class ChatClient implements Runnable
                     // 1. manda certificado para server (myCertificateText)
                     streamOut.write(myCertificateText.getBytes());
                     streamOut.flush();
-                    Step++;
-                    break;
+                    //Step++;
                 }
-                if(Step==1){
+         //       if(Step==1){
                     // 2. manda chave secreta (clientSecretKey)
                     SecretKey secret = Encryption.getSecret();
                     clientSecretKey = secret;
@@ -155,14 +154,15 @@ public class ChatClient implements Runnable
                     byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
                     streamOut.write(encryptPublicKey);
                     streamOut.flush();
-                    Step=2;
-                    break;
-                }
+                  //  Step=2;
+           /*     }
                 if(Step==2){
                     Step=3;
                     break;
                 }
-                if(Step==3){break;}
+                if(Step==3){
+                    break;
+                }*/
                 //String s = Base64.getEncoder().encodeToString(secret.getEncoded());
                 //System.out.println("Secret key = " + s);
                 //System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());

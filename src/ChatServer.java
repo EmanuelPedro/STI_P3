@@ -178,9 +178,16 @@ public class ChatServer implements Runnable
 				System.out.println("Cert not valid");
 
 			byte[] decryptWithPrivateKey = new byte[0];
-			//String s = new String(publicKey,StandardCharsets.UTF_8);
-			//System.out.println("PUBKEY = " + s);
-			decryptWithPrivateKey = encryption.decrypt2(publicKey, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
+			String s = new String(publicKey,StandardCharsets.UTF_8);
+			System.out.println("PUBKEY = " + s);
+
+			try{
+				decryptWithPrivateKey = encryption.decrypt2(publicKey, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
+				System.out.println("\n \n STUFF \n \n");
+			}catch (Exception e){
+				System.out.println("ERROR: Decrypt:"+e);
+
+			}
 
 			clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
 
