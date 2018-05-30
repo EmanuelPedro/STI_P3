@@ -3,10 +3,13 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 
 
 public class ChatClient implements Runnable
@@ -131,7 +134,6 @@ public class ChatClient implements Runnable
     public void run()
     {
         encryption = new Encryption();
-        String message;
         while (thread != null)
         {
             try
@@ -140,30 +142,29 @@ public class ChatClient implements Runnable
 
                 // 1. manda certificado para server (myCertificateText)
                 streamOut.write(myCertificateText.getBytes());
-
+                //streamOut.flush();
                 // 2. manda chave secreta (clientSecretKey)
                 SecretKey secret = Encryption.getSecret();
                 clientSecretKey = secret;
 
-                String s = new String(secret.getEncoded());
-                System.out.println("Secret key = " + s);
-                System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());
+                //String s = Base64.getEncoder().encodeToString(secret.getEncoded());
+                //System.out.println("Secret key = " + s);
+                //System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());
 
-                //esta a dar merda aqui. => No installed provider supports this key: sun.security.rsa.RSAPublicKeyImpl
                 byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
-                // ou é por causa do certificado estar mal criado e por isso "serverCertificate" tb ta mal ou então nao sei de onde vem esse erro
-                // que tem a ver com o algoritmo para encyptar (AES ou RSA/ECB/PKCS1Padding)
-                // entretanto isto entrou num loop sem fim sempre a repetir o que ta nesta função.
-                // só alterei nesta função e no handle do chatServer. do trabalho do outro grupo, estava a testar
-                // o authPhase 1 e 2 que é enviar o cert po server depois encryptar a chave simetrica do cliente com chave publica do server e enviar
 
-
-
+                //String string_encryptPublicKey = new String(encryptPublicKey,StandardCharsets.UTF_8);
+                //System.out.println("encryptPublicKey text format = " + string_encryptPublicKey);
                 streamOut.write(encryptPublicKey);
-                message = console.readLine();
-                streamOut.writeUTF(message);
+
+                // 3. manda assinatura
+
+                // 4. manda a mensagem encriptada com hash
+
+                //message = console.readLine();
+                //streamOut.writeUTF(message);
+
                 streamOut.flush();
-                // 3. assinar mensagem
 
                 /*message = console.readLine();
                 try {
@@ -187,9 +188,10 @@ public class ChatClient implements Runnable
     }
 
 
-    public void handle(String msg, String clientID, String signature, String publicKey)
+    public void handle(byte[] certificate, byte[] publicKey, String message)
     {
         System.out.println("temporariamente indisponivel");
+/*
 
         // Receives message from server
         //encryption = new Encryption();
@@ -227,7 +229,7 @@ public class ChatClient implements Runnable
             e.printStackTrace();
         }
         //System.out.println("Message decrypted: " + decryptMessage);
-
+*/
     }
 
     // Inits new client thread
@@ -235,8 +237,6 @@ public class ChatClient implements Runnable
     {
         console   = new DataInputStream(System.in);
         streamOut = new DataOutputStream(socket.getOutputStream());
-        //streamOut.writeUTF(encryption.encoder.encodeToString(encryption.getPublicKey().getEncoded()));
-        //streamOut.flush();
 
         if (thread == null)
         {
@@ -288,13 +288,11 @@ class ChatClientThread extends Thread
     private Socket           socket   = null;
     private ChatClient       client   = null;
     private DataInputStream  streamIn = null;
-    //private String username = null;
 
     public ChatClientThread(ChatClient _client, Socket _socket)
     {
         client   = _client;
         socket   = _socket;
-        //username = user;
         open();
         start();
     }
@@ -328,20 +326,21 @@ class ChatClientThread extends Thread
     public void run()
     {
         //chama esta função ao receber resposta do server
-        String message, signature, clientID, publicKey;
+        String message, clientID;
         while (true)
-        {
-            try {
-                clientID = streamIn.readUTF();
+        {   try
+            {
+                int nCert, nPublicKey;
+                byte[] certificate = new byte[16000];
+                byte[] publicKey = new byte[1600];
+                nCert = streamIn.read(certificate);
+                nPublicKey = streamIn.read(publicKey);
                 message = streamIn.readUTF();
-                signature = streamIn.readUTF();
-                publicKey = streamIn.readUTF();
 
-                //System.out.println("ClientID before handle = " +clientID);
-                //System.out.println("Message before handle = " +message);
-                //System.out.println("Signature before handle = " +signature);
-                //System.out.println("publicKey before handle = " +publicKey);
-                client.handle(message, clientID, signature, publicKey);
+                if ((nCert > 0) && (nPublicKey > 0))
+                {
+                    client.handle(certificate, publicKey, message);
+                }
             }
             catch(IOException ioe)
             {

@@ -1,6 +1,7 @@
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
@@ -14,8 +15,8 @@ public class Encryption {
     private String defaultPass = "PasswordForSTIP3";
     public Base64.Encoder encoder;
     public Base64.Decoder decoder;
-    private PrivateKey privateKey = null;
-    private PublicKey publicKey = null;
+    //private PrivateKey privateKey = null;
+    //private PublicKey publicKey = null;
     //LocalDateTime timePoint = LocalDateTime.now();
     static KeyGenerator keyGen;
 
@@ -34,8 +35,8 @@ public class Encryption {
             keyPairGen = KeyPairGenerator.getInstance("DSA", "SUN");
             keyPairGen.initialize(1024);
             pair = keyPairGen.generateKeyPair();
-            privateKey = pair.getPrivate();
-            publicKey = pair.getPublic();
+            //privateKey = pair.getPrivate();
+            //publicKey = pair.getPublic();
             //System.out.println("Private key: " + privateKey);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -121,21 +122,38 @@ public class Encryption {
         return decryptedText;
     }
 
-    public byte[] decrypt2(byte[] encryptedText, Key secretKey) throws Exception {
-        //System.out.println("Entrei decrypt ");
-        //System.out.println("Encrypt text= " + encryptedText);
-        //System.out.println("Private key sign = " + privateKey);
-        //System.out.println("Secretkey = " + secret);
+    public byte[] decrypt2(byte[] encryptedText, Key secretKey, String algorithm) {
+        String s = new String(encryptedText,StandardCharsets.UTF_8);
+        System.out.println("Valor de encryptedText = " + encryptedText);
+        byte[] decryptedByte = new byte[200];
+        try{
+            Cipher aesCipher = Cipher.getInstance(algorithm);
+            if(algorithm.equals("AES")){
+                aesCipher.init(Cipher.DECRYPT_MODE,secretKey,aesCipher.getParameters());
+            }
+            else if(algorithm.equals("RSA/ECB/PKCS1Padding")){
+                aesCipher.init(Cipher.DECRYPT_MODE,secretKey);
+            }
 
-        //byte[] encryptedTextByte =decoder.decode(encryptedText);
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        //System.out.println("Length = " + cipher.doFinal(encryptedTextByte).length);
-        byte[] decryptedByte = cipher.doFinal(encryptedText);
-        //String decryptedText = new String(decryptedByte);
+            decryptedByte = cipher.doFinal(encryptedText);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
+
         return decryptedByte;
     }
 
-    public String signMessage(String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    /*public String signMessage(String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         byte[] TextSigned, data = decoder.decode(plainText);
         System.out.println("Private key: " + privateKey);
         Signature sign = Signature.getInstance("SHA1withDSA","SUN");
@@ -143,7 +161,7 @@ public class Encryption {
         sign.update(data,0,data.length);
         TextSigned = sign.sign();
         return encoder.encodeToString(TextSigned);
-    }
+    }*/
 
     public boolean isSigned(PublicKey pubKey, String signature, String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature dsa = Signature.getInstance("SHA1withDSA","SUN");
@@ -154,9 +172,9 @@ public class Encryption {
         signed = dsa.verify(signatureEncoded);
         return signed;
     }
-    public PublicKey getPublicKey() {
+    /*public PublicKey getPublicKey() {
         return publicKey;
-    }
+    }*/
 
     public PublicKey getSendedPublicKey(String pubKey) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] pubKeyEncoded = decoder.decode(pubKey);

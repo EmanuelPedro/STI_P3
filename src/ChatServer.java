@@ -19,7 +19,7 @@ public class ChatServer implements Runnable
 	private ServerSocket server_socket = null;
 	private Thread thread = null;
 	private int clientCount = 0;
-	private Encryption encryption = null;
+	//private Encryption encryption = null;
 	private X509Certificate caCertificate;
 	private KeyStore keystore;
 	private String servercertname;
@@ -95,20 +95,13 @@ public class ChatServer implements Runnable
 
 			caCertificate = loadCert(cacertname);
 			System.out.println("Loaded CA Certificate");
-			//System.out.println("keystorefilename = " + keystorefilename);
-			//System.out.println("keystorepass = " + keystorepassword);
-			//InputStream f = new FileInputStream("C:\\Users\\tripe\\Desktop\\2017_2018\\STI\\STI_P3\\server.keystore");
-			keystore = loadKeystore(keystorefilename,"sti_tp3");
 
+			keystore = loadKeystore(keystorefilename,"sti_tp3");
 			System.out.println("Loaded KeyStore");
 
 			this.servercertname = servercertname;
 			this.keystorealias = keystorealias;
 			this.keystorepass = keystorepassword;
-
-			//System.out.println("servercertname = " + keystorefilename);
-			//System.out.println("keystorealias = " + keystorepassword);
-
 
 			start();
 		}
@@ -165,14 +158,15 @@ public class ChatServer implements Runnable
 		return -1;
 	}
 
-	public synchronized void handle(int ID, String input) throws Exception {
+	public synchronized void handle(int ID, byte[] certificate, byte[] publicKey, String message) throws Exception {
 		String decryptMessage = null;
-		encryption = new Encryption();
+		Encryption encryption = new Encryption();
 		try {
 			int leaving_id = findClient(ID);
-			String clientCert = new String(input);
+			String clientCert = new String(certificate, "UTF-8");
+			//System.out.println("client cert = " + clientCert);
+			//System.out.println("message = " + input);
 			boolean certReceived = clients[leaving_id].updateCertificate(clientCert);
-			//print isCertValid
 			if (certReceived)
 				System.out.println("cert received");
 			else
@@ -183,14 +177,18 @@ public class ChatServer implements Runnable
 			else
 				System.out.println("Cert not valid");
 
-			byte[] decryptWithPrivateKey;
-			decryptWithPrivateKey = encryption.decrypt2(input.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()));
+			byte[] decryptWithPrivateKey = new byte[0];
+			//String s = new String(publicKey,StandardCharsets.UTF_8);
+			//System.out.println("PUBKEY = " + s);
+			decryptWithPrivateKey = encryption.decrypt2(publicKey, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
 
 			clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
 
 			//set client secretKey
 			SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
 			clients[leaving_id].setSecretKey(secretKey);
+
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -279,10 +277,6 @@ public class ChatServer implements Runnable
 		}
 		else
 			System.out.println("Client refused: maximum " + clients.length + " reached.");
-	}
-
-	public Encryption getEncryption() {
-		return encryption;
 	}
 
 	public static void main(String args[])
@@ -381,9 +375,18 @@ class ChatServerThread extends Thread
 		{
 			try
 			{
+				int nCert, nPublicKey;
+				byte[] certificate = new byte[16000];
+				byte[] publicKey = new byte[1600];
+				nCert = streamIn.read(certificate);
+				nPublicKey = streamIn.read(publicKey);
 				message = streamIn.readUTF();
-
-				server.handle(ID, message);
+				System.out.println(">>>nCert = " + nCert);
+				System.out.println(">>>nPublicKey = " + nPublicKey);
+				if ((nCert > 0) && (nPublicKey > 0))
+				{
+					server.handle(ID, certificate, publicKey, message);
+				}
 			}
 			catch(IOException ioe)
 			{
@@ -395,28 +398,6 @@ class ChatServerThread extends Thread
 			}
 		}
 	}
-
-	/*public void getPublicKey()
-	{
-		String pubKey = null;
-		try {
-			pubKey = streamIn.readUTF();
-
-			publicKey = server.getEncryption().getSendedPublicKey(pubKey);
-
-			streamOut.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchProviderException e) {
-			e.printStackTrace();
-		} catch (InvalidKeySpecException e) {
-			e.printStackTrace();
-		}
-
-
-	}*/
 
 	// Opens thread
 	public void open() throws IOException
