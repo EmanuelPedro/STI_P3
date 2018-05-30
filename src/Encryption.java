@@ -27,7 +27,7 @@ public class Encryption {
         KeyPairGenerator keyPairGen;
         KeyPair pair;
         byte[] key = defaultPass.getBytes();
-        secret = new SecretKeySpec(key, "AES");
+        secret = new SecretKeySpec(key, "SHA1withRSA");
         encoder = Base64.getEncoder();
         decoder = Base64.getDecoder();
         try {

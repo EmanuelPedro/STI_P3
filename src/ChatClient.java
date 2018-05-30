@@ -28,7 +28,7 @@ public class ChatClient implements Runnable
     String keyPass = null;
     String keyAlias = null;
     SecretKey clientSecretKey = null;
-
+    int Step=0;
 
     public ChatClient(String serverName, int serverPort, String certname, String servercertname, String keystorename, String keystorepass, String keystorealias)
     {
@@ -133,29 +133,44 @@ public class ChatClient implements Runnable
 
     public void run()
     {
-        encryption = new Encryption();
+
+
         while (thread != null)
         {
             try
-            {
+            {   encryption = new Encryption();
                 // Sends message from console to server
-
-                // 1. manda certificado para server (myCertificateText)
-                streamOut.write(myCertificateText.getBytes());
-                //streamOut.flush();
-                // 2. manda chave secreta (clientSecretKey)
-                SecretKey secret = Encryption.getSecret();
-                clientSecretKey = secret;
-
+                if(Step==0) {
+                    // 1. manda certificado para server (myCertificateText)
+                    streamOut.write(myCertificateText.getBytes());
+                    streamOut.flush();
+                    Step++;
+                    break;
+                }
+                if(Step==1){
+                    // 2. manda chave secreta (clientSecretKey)
+                    SecretKey secret = Encryption.getSecret();
+                    clientSecretKey = secret;
+                    System.out.println(secret + "" + clientSecretKey);
+                    byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
+                    streamOut.write(encryptPublicKey);
+                    streamOut.flush();
+                    Step=2;
+                    break;
+                }
+                if(Step==2){
+                    Step=3;
+                    break;
+                }
+                if(Step==3){break;}
                 //String s = Base64.getEncoder().encodeToString(secret.getEncoded());
                 //System.out.println("Secret key = " + s);
                 //System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());
 
-                byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
 
                 //String string_encryptPublicKey = new String(encryptPublicKey,StandardCharsets.UTF_8);
                 //System.out.println("encryptPublicKey text format = " + string_encryptPublicKey);
-                streamOut.write(encryptPublicKey);
+
 
                 // 3. manda assinatura
 
@@ -164,7 +179,7 @@ public class ChatClient implements Runnable
                 //message = console.readLine();
                 //streamOut.writeUTF(message);
 
-                streamOut.flush();
+
 
                 /*message = console.readLine();
                 try {
