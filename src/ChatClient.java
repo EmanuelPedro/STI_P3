@@ -30,21 +30,19 @@ public class ChatClient implements Runnable
     SecretKey clientSecretKey = null;
     int Step=0;
 
-    public ChatClient(String serverName, int serverPort, String certname, String servercertname, String keystorename, String keystorepass, String keystorealias)
-    {
+    public ChatClient(String serverName, int serverPort, String certname, String servercertname, String keystorename, String keystorepass, String keystorealias) {
         System.out.println("Establishing connection to server...");
         //username = user;
 
-        try
-        {
+        try {
             socket = new Socket(serverName, serverPort);
             System.out.println("Connected to server: " + socket);
 
-            myCertificate = loadCert(certname,true);
+            myCertificate = loadCert(certname, true);
 
-            serverCertificate = loadCert(servercertname,false);
+            serverCertificate = loadCert(servercertname, false);
 
-            keystore = loadKeystore(keystorename,keystorepass);
+            keystore = loadKeystore(keystorename, keystorepass);
             System.out.println("Loaded KeyStore");
 
             keyPass = keystorepass;
@@ -54,16 +52,10 @@ public class ChatClient implements Runnable
             // Establishes connection with server (name and port)
 
             start();
-        }
-
-        catch(UnknownHostException uhe)
-        {
+        } catch (UnknownHostException uhe) {
             // Host unkwnown
             System.out.println("Error establishing connection - host unknown: " + uhe.getMessage());
-        }
-
-        catch(IOException ioexception)
-        {
+        } catch (IOException ioexception) {
             // Other error establishing connection
             System.out.println("Error establishing connection - unexpected exception: " + ioexception.getMessage());
         }
@@ -131,30 +123,51 @@ public class ChatClient implements Runnable
         }
     }
 
-    public void run()
-    {
+    public void run() {
 
 
-        while (thread != null)
-        {
-            try
-            {   encryption = new Encryption();
-                // Sends message from console to server
-                if(Step==0) {
+        String message;
+        while (thread != null) {
+            try {
+                message = console.readLine();
+
+
+                try {
+                    encryption = new Encryption();
+                    // Sends message from console to server
+                    //    if(Step==0) {
                     // 1. manda certificado para server (myCertificateText)
-                    streamOut.write(myCertificateText.getBytes());
-                    streamOut.flush();
-                    //Step++;
-                }
-         //       if(Step==1){
-                    // 2. manda chave secreta (clientSecretKey)
+
                     SecretKey secret = Encryption.getSecret();
                     clientSecretKey = secret;
-                    System.out.println(secret + "" + clientSecretKey);
+                  //  System.out.println(secret + "" + clientSecretKey);
                     byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
-                    streamOut.write(encryptPublicKey);
-                    streamOut.flush();
-                  //  Step=2;
+                    String encryptPublicKeyText = new String(encryptPublicKey, "UTF-8");
+                    streamOut.writeUTF(message);
+                    streamOut.writeUTF(myCertificateText);
+                    System.out.println(">>>>>"+encryptPublicKeyText);
+                    streamOut.writeUTF(encryptPublicKeyText);
+                   // streamOut.flush();
+                    //streamOut.write(encryptPublicKey);
+                    //streamOut.flush();
+
+
+                } catch (Exception e) {
+                    System.out.println("Error sending string to server: " + e.getMessage());
+                }
+
+                streamOut.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //Step++;
+        //  }
+        //       if(Step==1){
+        // 2. manda chave secreta (clientSecretKey)
+
+        //  Step=2;
            /*     }
                 if(Step==2){
                     Step=3;
@@ -163,21 +176,21 @@ public class ChatClient implements Runnable
                 if(Step==3){
                     break;
                 }*/
-                //String s = Base64.getEncoder().encodeToString(secret.getEncoded());
-                //System.out.println("Secret key = " + s);
-                //System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());
+        //String s = Base64.getEncoder().encodeToString(secret.getEncoded());
+        //System.out.println("Secret key = " + s);
+        //System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());
 
 
-                //String string_encryptPublicKey = new String(encryptPublicKey,StandardCharsets.UTF_8);
-                //System.out.println("encryptPublicKey text format = " + string_encryptPublicKey);
+        //String string_encryptPublicKey = new String(encryptPublicKey,StandardCharsets.UTF_8);
+        //System.out.println("encryptPublicKey text format = " + string_encryptPublicKey);
 
 
-                // 3. manda assinatura
+        // 3. manda assinatura
 
-                // 4. manda a mensagem encriptada com hash
+        // 4. manda a mensagem encriptada com hash
 
-                //message = console.readLine();
-                //streamOut.writeUTF(message);
+        //message = console.readLine();
+        //streamOut.writeUTF(message);
 
 
 
@@ -191,17 +204,9 @@ public class ChatClient implements Runnable
                 }
 
                 streamOut.flush();*/
-            }
-            catch(IOException ioexception)
-            {
-                System.out.println("Error sending string to server: " + ioexception.getMessage());
-                stop();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
+
+    }
 
     public void handle(byte[] certificate, byte[] publicKey, String message)
     {

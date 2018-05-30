@@ -158,15 +158,16 @@ public class ChatServer implements Runnable
 		return -1;
 	}
 
-	public synchronized void handle(int ID, byte[] certificate, byte[] publicKey, String message) throws Exception {
+	public synchronized void handle(int ID, String certificate,String publicKey, String message) throws Exception {
 		String decryptMessage = null;
 		Encryption encryption = new Encryption();
+
 		try {
 			int leaving_id = findClient(ID);
-			String clientCert = new String(certificate, "UTF-8");
+			//String clientCert = new String(certificate, "UTF-8");
 			//System.out.println("client cert = " + clientCert);
 			//System.out.println("message = " + input);
-			boolean certReceived = clients[leaving_id].updateCertificate(clientCert);
+			boolean certReceived = clients[leaving_id].updateCertificate(certificate);
 			if (certReceived)
 				System.out.println("cert received");
 			else
@@ -176,22 +177,18 @@ public class ChatServer implements Runnable
 				System.out.println("cert valid");
 			else
 				System.out.println("Cert not valid");
-
+			byte[] publicKeyByte = publicKey.getBytes();
 			byte[] decryptWithPrivateKey = new byte[0];
-			String s = new String(publicKey,StandardCharsets.UTF_8);
-			System.out.println("PUBKEY = " + s);
+			//String s = new String(publicKey,StandardCharsets.UTF_8);
+			//System.out.println("PUBKEY = " + s);
 
 
 			try{
-				decryptWithPrivateKey = encryption.decrypt2(publicKey, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
-				System.out.println("\n \n STUFF \n \n");
+				decryptWithPrivateKey = encryption.decrypt2(publicKeyByte, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
 			}catch (Exception e){
 				System.out.println("ERROR: Decrypt:"+e);
-
 			}
-
 			clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
-
 			//set client secretKey
 			SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
 			clients[leaving_id].setSecretKey(secretKey);
@@ -383,18 +380,20 @@ class ChatServerThread extends Thread
 		{
 			try
 			{
-				int nCert, nPublicKey;
-				byte[] certificate = new byte[16000];
-				byte[] publicKey = new byte[1600];
-				nCert = streamIn.read(certificate);
-				nPublicKey = streamIn.read(publicKey);
-				message = streamIn.readUTF();
-				System.out.println(">>>nCert = " + nCert);
-				System.out.println(">>>nPublicKey = " + nPublicKey);
-				if ((nCert > 0) && (nPublicKey > 0))
-				{
+				String certificate, publicKey;
+				//byte[] certificate = new byte[16000];
+				//byte[] publicKey = new byte[1600];
+				message= streamIn.readUTF();
+				certificate = streamIn.readUTF();
+				publicKey = streamIn.readUTF();
+				//message = streamIn.readUTF();
+			/*	System.out.println(">>>Message:  "+message);
+				System.out.println(">>>nCert = " + certificate);
+				System.out.println(">>>nPublicKey = " + publicKey);*/
+				//if ((nCert > 0) && (nPublicKey > 0))
+				//{
 					server.handle(ID, certificate, publicKey, message);
-				}
+				//}
 			}
 			catch(IOException ioe)
 			{

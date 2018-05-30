@@ -89,6 +89,7 @@ public class Encryption {
             else if (algorithm.equals("RSA/ECB/PKCS1Padding")) {
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             }
+            System.out.println(plainText.length);
             encryptedByte = cipher.doFinal(plainText);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -127,15 +128,16 @@ public class Encryption {
         System.out.println("Valor de encryptedText = " + encryptedText);
         byte[] decryptedByte = new byte[200];
         try{
-            Cipher aesCipher = Cipher.getInstance(algorithm);
+           cipher = Cipher.getInstance(algorithm);
             if(algorithm.equals("AES")){
-                aesCipher.init(Cipher.DECRYPT_MODE,secretKey,aesCipher.getParameters());
+                cipher.init(Cipher.DECRYPT_MODE,secretKey,cipher.getParameters());
             }
             else if(algorithm.equals("RSA/ECB/PKCS1Padding")){
-                aesCipher.init(Cipher.DECRYPT_MODE,secretKey);
+                cipher.init(Cipher.DECRYPT_MODE,secretKey);
             }
-
-            decryptedByte = cipher.doFinal(encryptedText);
+            System.out.println("SECRET   "+secretKey.toString()+"\n>> "+ encryptedText);
+//            System.out.println(Base64.getMimeDecoder().decode(encryptedText).length);
+            decryptedByte =cipher.doFinal(encryptedText);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
