@@ -1,17 +1,13 @@
-
 import javax.crypto.spec.SecretKeySpec;
 import java.net.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-
+import java.util.Arrays;
+import java.util.Base64;
 
 public class ChatServer implements Runnable
 {
@@ -19,8 +15,8 @@ public class ChatServer implements Runnable
 	private ServerSocket server_socket = null;
 	private Thread thread = null;
 	private int clientCount = 0;
-	//private Encryption encryption = null;
 	private X509Certificate caCertificate;
+	private X509Certificate serverCertificate;
 	private KeyStore keystore;
 	private String servercertname;
 	private String keystorealias;
@@ -55,7 +51,7 @@ public class ChatServer implements Runnable
 		}
 		KeyStore keystore = null;
 		try {
-			keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+			keystore = KeyStore.getInstance("JCEKS");
 			keystore.load(is, password.toCharArray());
 			return keystore;
 		} catch (Exception e) {
@@ -95,8 +91,9 @@ public class ChatServer implements Runnable
 
 			caCertificate = loadCert(cacertname);
 			System.out.println("Loaded CA Certificate");
+			serverCertificate = loadCert(servercertname);
 
-			keystore = loadKeystore(keystorefilename,"sti_tp3");
+			keystore = loadKeystore(keystorefilename,keystorepassword);
 			System.out.println("Loaded KeyStore");
 
 			this.servercertname = servercertname;
@@ -158,15 +155,11 @@ public class ChatServer implements Runnable
 		return -1;
 	}
 
-	public synchronized void handle(int ID, String certificate,String publicKey, String message) throws Exception {
-		String decryptMessage = null;
+	public synchronized void handle(int ID, String certificate,String publicKey, String signature, String message) throws Exception {
+		int leaving_id = findClient(ID);
 		Encryption encryption = new Encryption();
 
 		try {
-			int leaving_id = findClient(ID);
-			//String clientCert = new String(certificate, "UTF-8");
-			//System.out.println("client cert = " + clientCert);
-			//System.out.println("message = " + input);
 			boolean certReceived = clients[leaving_id].updateCertificate(certificate);
 			if (certReceived)
 				System.out.println("cert received");
@@ -177,60 +170,121 @@ public class ChatServer implements Runnable
 				System.out.println("cert valid");
 			else
 				System.out.println("Cert not valid");
-			byte[] publicKeyByte = publicKey.getBytes();
-			byte[] decryptWithPrivateKey = new byte[0];
-			//String s = new String(publicKey,StandardCharsets.UTF_8);
-			//System.out.println("PUBKEY = " + s);
 
+			//byte[] decryptWithPrivateKey;
+			//decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
 
-			try{
-				decryptWithPrivateKey = encryption.decrypt2(publicKeyByte, keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
-			}catch (Exception e){
-				System.out.println("ERROR: Decrypt:"+e);
-			}
-			clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
+			clients[leaving_id].setClientSecretKey(publicKey.getBytes());
 			//set client secretKey
-			SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
+			SecretKeySpec secretKey = new SecretKeySpec(publicKey.getBytes(), "AES");
 			clients[leaving_id].setSecretKey(secretKey);
 
+			// verify signature
+			// em falta
+
+
+			// verify message
+
+			// generate hash message, messageDigest para textos longos
+			//String sender = message.substring(0, message.indexOf("|"));
+			String sendedMessage = message.substring(0, message.indexOf("|"));
+			String hashedMessage = message.substring(message.indexOf("|")+1);
+			//System.out.println("SM = " + sendedMessage);
+			//System.out.println("HM = " + hashedMessage);
+
+			MessageDigest digest = MessageDigest.getInstance("MD5");
+			digest.update(sendedMessage.getBytes());
+			byte hashedBytes[] = digest.digest();
+
+			StringBuffer stringBuffer = new StringBuffer();
+			for (int i = 0; i < hashedBytes.length; i++) {
+				stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
+			}
+
+			if (stringBuffer.toString().equals(hashedMessage))
+			{
+				System.out.println("Got new message = " + sendedMessage);
+				if (sendedMessage.equals(".quit"))
+				{
+					// client quits
+					clients[leaving_id].send(certificate);
+					clients[leaving_id].send(publicKey);
+					clients[leaving_id].send(signature);
+					clients[leaving_id].send(ID + ": " + ".quit" + "|" + hashedMessage);
+					// Notify remaing users
+					for (int i = 0; i < clientCount; i++)
+						if (i != leaving_id) {
+							clients[i].send(certificate);
+							clients[i].send(publicKey);
+							clients[i].send(signature);
+							clients[i].send(ID + ": " + "Client " + ID + " exits.." + "|" + hashedMessage);
+						}
+					remove(ID);
+				}
+				else
+				{
+					for (int i = 0; i < clientCount; i++) {
+						clients[i].send(certificate);
+						clients[i].send(publicKey);
+						clients[i].send(signature);
+						clients[i].send(ID + ": " + sendedMessage + "|" + hashedMessage);
+					}
+				}
+			}
+			else
+			{
+				System.out.println("Message not valid! ");
+				clients[leaving_id].send(certificate);
+				clients[leaving_id].send(publicKey);
+				clients[leaving_id].send(signature);
+				clients[leaving_id].send(ID + ": " + ".quit" + "|" + hashedMessage);
+			}
+
+			//decrypt message:
+			//byte[] decryptMessage, decodeMessage = Base64.getDecoder().decode(message);
+
+			//decryptMessage = encryption.decrypt2(decodeMessage, clients[leaving_id].getSecretKey(), "AES");
+			//String decrypMessageText = Base64.getEncoder().encodeToString(decryptMessage);
+			//System.out.println("Decrypted message = " + decrypMessageText);
 
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		/*try {
-			decryptMessage = encryption.decrypt(input);
+//		try {
+//			decryptMessage = encryption.decrypt(input);
+//
+//			if (decryptMessage.equals(".quit")) {
+//				int leaving_id = findClient(ID);
+//				// Client exits
+//
+//				clients[leaving_id].send(Integer.toString(ID));
+//				clients[leaving_id].send(encryption.encrypt(decryptMessage));
+//				clients[leaving_id].send(signature);
+//				clients[leaving_id].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
+//				// Notify remaing users
+//				for (int i = 0; i < clientCount; i++)
+//					if (i != leaving_id) {
+//						clients[i].send(Integer.toString(ID));
+//						clients[i].send(encryption.encrypt("Client " + ID + " exits.."));
+//						clients[i].send(signature);
+//						clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
+//					}
+//				remove(ID);
+//			} else {
+//				// Brodcast message for every other client online
+//				for (int i = 0; i < clientCount; i++) {
+//					clients[i].send(Integer.toString(ID));
+//					clients[i].send(encryption.encrypt(decryptMessage));
+//					clients[i].send(signature);
+//					clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
-			if (decryptMessage.equals(".quit")) {
-				int leaving_id = findClient(ID);
-				// Client exits
-
-				clients[leaving_id].send(Integer.toString(ID));
-				clients[leaving_id].send(encryption.encrypt(decryptMessage));
-				clients[leaving_id].send(signature);
-				clients[leaving_id].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
-				// Notify remaing users
-				for (int i = 0; i < clientCount; i++)
-					if (i != leaving_id) {
-						clients[i].send(Integer.toString(ID));
-						clients[i].send(encryption.encrypt("Client " + ID + " exits.."));
-						clients[i].send(signature);
-						clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
-					}
-				remove(ID);
-			} else {
-				// Brodcast message for every other client online
-				for (int i = 0; i < clientCount; i++) {
-					clients[i].send(Integer.toString(ID));
-					clients[i].send(encryption.encrypt(decryptMessage));
-					clients[i].send(signature);
-					clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	public synchronized void remove(int ID)
@@ -259,6 +313,17 @@ public class ChatServer implements Runnable
 
 			toTerminate.stop();
 		}
+	}
+
+	static byte[] trim(byte[] bytes)
+	{
+		int i = bytes.length - 1;
+		while (i >= 0 && bytes[i] == 0)
+		{
+			--i;
+		}
+
+		return Arrays.copyOf(bytes, i + 1);
 	}
 
 	private void addThread(Socket socket)
@@ -305,11 +370,9 @@ class ChatServerThread extends Thread
 	private int              ID        = -1;
 	private DataInputStream  streamIn  =  null;
 	private DataOutputStream streamOut = null;
-	//private PublicKey publicKey		   = null;
 	private X509Certificate clientCertificate;
 	private SecretKeySpec secretKey;
 	private byte[] ClientSecretKey;
-
 
 	public ChatServerThread(ChatServer _server, Socket _socket)
 	{
@@ -374,26 +437,18 @@ class ChatServerThread extends Thread
 	public void run()
 	{
 		System.out.println("Server Thread " + ID + " running.");
-		String message;
+		String message, certificate, publicKey, signature;
 
 		while (true)
 		{
 			try
 			{
-				String certificate, publicKey;
-				//byte[] certificate = new byte[16000];
-				//byte[] publicKey = new byte[1600];
-				message= streamIn.readUTF();
 				certificate = streamIn.readUTF();
 				publicKey = streamIn.readUTF();
-				//message = streamIn.readUTF();
-			/*	System.out.println(">>>Message:  "+message);
-				System.out.println(">>>nCert = " + certificate);
-				System.out.println(">>>nPublicKey = " + publicKey);*/
-				//if ((nCert > 0) && (nPublicKey > 0))
-				//{
-					server.handle(ID, certificate, publicKey, message);
-				//}
+				signature = streamIn.readUTF();
+				message= streamIn.readUTF();
+
+				server.handle(ID, certificate, publicKey, signature, message);
 			}
 			catch(IOException ioe)
 			{

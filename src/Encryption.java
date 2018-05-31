@@ -1,12 +1,9 @@
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-import java.time.LocalDate;
 import java.util.Base64;
 
 public class Encryption {
@@ -15,9 +12,6 @@ public class Encryption {
     private String defaultPass = "PasswordForSTIP3";
     public Base64.Encoder encoder;
     public Base64.Decoder decoder;
-    //private PrivateKey privateKey = null;
-    //private PublicKey publicKey = null;
-    //LocalDateTime timePoint = LocalDateTime.now();
     static KeyGenerator keyGen;
 
     public Encryption()
@@ -60,26 +54,36 @@ public class Encryption {
         return secretKey;
     }
 
-    public SecretKeySpec setSecretKeySpec()
-    {
-        byte[] key = defaultPass.getBytes();
-        secret = new SecretKeySpec(key, "AES");
+    public String encrypt(String plainText, PublicKey secretKey, String algorithm) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        //System.out.println("Entrei encrypt ");
+        //SecretKeySpec secKey = new SecretKeySpec(secretKey, algorithm);
 
-        return secret;
+        cipher = Cipher.getInstance(algorithm);
+        System.out.println("Length data encrypt = " + plainText.length());
+        System.out.println("Length key encrypt = " + secretKey.getEncoded().length);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        byte[] newData = cipher.doFinal(plainText.getBytes());
+
+        return encoder.encodeToString(newData);
     }
 
-    public String encrypt(String plainText) throws Exception {
-        //System.out.println("Entrei encrypt ");
-        byte[] plainTextByte = plainText.getBytes();
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
-        byte[] encryptedByte = cipher.doFinal(plainTextByte);
-        String encryptedText = encoder.encodeToString(encryptedByte);
-        return encryptedText;
+    public String decrypt(String encryptedText, Key secretKey, String algorithm) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance(algorithm);
+        //SecretKeySpec secKey = new SecretKeySpec(secretKey, algorithm);
+        System.out.println("Length data decrypt = " + encryptedText.length());
+        System.out.println("Length key decrypt = " + secretKey.getEncoded().length);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        byte[] newData = cipher.doFinal(encryptedText.getBytes());
+        return new String(newData);
     }
 
-    public byte[] encrypt2(byte[] plainText, Key secretKey, String algorithm) {
-        //System.out.println("Entrei encrypt ");
+    public byte[] encrypt2(byte[] plainText, Key secretKey, String algorithm) throws UnsupportedEncodingException {
+        String text = new String(plainText);
+        //System.out.println("Valor de plaintext = " + encoder.encodeToString(plainText));    // byte -> string
+        //System.out.println("Valor de key = " + encoder.encodeToString(secretKey.getEncoded()));     //key -> string
         byte[] encryptedByte = new byte[200];
+        System.out.println("Length data encrypt = " + plainText.length);
+        System.out.println("Length key encrypt = " + secretKey.getEncoded().length);
 
         try {
             cipher = Cipher.getInstance(algorithm);
@@ -89,7 +93,7 @@ public class Encryption {
             else if (algorithm.equals("RSA/ECB/PKCS1Padding")) {
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             }
-            System.out.println(plainText.length);
+            //System.out.println(plainText.length);
             encryptedByte = cipher.doFinal(plainText);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -109,23 +113,11 @@ public class Encryption {
         return encryptedByte;
     }
 
-    public String decrypt(String encryptedText) throws Exception {
-        //System.out.println("Entrei decrypt ");
-        //System.out.println("Encrypt text= " + encryptedText);
-        //System.out.println("Private key sign = " + privateKey);
-        //System.out.println("Secretkey = " + secret);
-
-        byte[] encryptedTextByte =decoder.decode(encryptedText);
-        cipher.init(Cipher.DECRYPT_MODE, secret);
-        //System.out.println("Length = " + cipher.doFinal(encryptedTextByte).length);
-        byte[] decryptedByte = cipher.doFinal(encryptedTextByte);
-        String decryptedText = new String(decryptedByte);
-        return decryptedText;
-    }
-
     public byte[] decrypt2(byte[] encryptedText, Key secretKey, String algorithm) {
-        String s = new String(encryptedText,StandardCharsets.UTF_8);
-        System.out.println("Valor de encryptedText = " + encryptedText);
+        //String s = new String(encryptedText,StandardCharsets.UTF_8);
+        //System.out.println("Valor de encryptedText = " + encoder.encodeToString(encryptedText));
+        System.out.println("Length data decrypt = " + encryptedText.length);
+        System.out.println("Length key decrypt = " + secretKey.getEncoded().length);
         byte[] decryptedByte = new byte[200];
         try{
            cipher = Cipher.getInstance(algorithm);
@@ -135,8 +127,7 @@ public class Encryption {
             else if(algorithm.equals("RSA/ECB/PKCS1Padding")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey);
             }
-            System.out.println("SECRET   "+secretKey.toString()+"\n>> "+ encryptedText);
-//            System.out.println(Base64.getMimeDecoder().decode(encryptedText).length);
+
             decryptedByte =cipher.doFinal(encryptedText);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -155,15 +146,16 @@ public class Encryption {
         return decryptedByte;
     }
 
-    /*public String signMessage(String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        byte[] TextSigned, data = decoder.decode(plainText);
-        System.out.println("Private key: " + privateKey);
-        Signature sign = Signature.getInstance("SHA1withDSA","SUN");
-        sign.initSign(privateKey);
-        sign.update(data,0,data.length);
-        TextSigned = sign.sign();
+    public String signMessage(SecretKey secretKey, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        byte[] TextSigned;
+        //System.out.println("Private key: " + privateKey);
+
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(privateKey);
+        signature.update(secretKey.getEncoded());
+        TextSigned = signature.sign();
         return encoder.encodeToString(TextSigned);
-    }*/
+    }
 
     public boolean isSigned(PublicKey pubKey, String signature, String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature dsa = Signature.getInstance("SHA1withDSA","SUN");
@@ -174,9 +166,6 @@ public class Encryption {
         signed = dsa.verify(signatureEncoded);
         return signed;
     }
-    /*public PublicKey getPublicKey() {
-        return publicKey;
-    }*/
 
     public PublicKey getSendedPublicKey(String pubKey) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
         byte[] pubKeyEncoded = decoder.decode(pubKey);
@@ -186,38 +175,6 @@ public class Encryption {
         keyFactory = KeyFactory.getInstance("DSA", "SUN");
         return keyFactory.generatePublic(pubKeySpec);
     }
-
-    public void escreveFicheiro(String fileName) throws IOException {
-        String str = "127.0.0.1\nclient4\nclient5";
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
-        writer.write(str);
-
-        writer.close();
-    }
-
-    /*public KeyStore loadKeystore(String pathToKeyStore, String password){
-        FileInputStream is = null;
-        try {
-            is = new FileInputStream(pathToKeyStore);
-        } catch (FileNotFoundException e) {
-            System.out.println("Keystore not found");
-            System.exit(0);
-        }
-        System.out.println("keystorefilename = " + pathToKeyStore);
-        System.out.println("keystorepass = " + password);
-        KeyStore keystore = null;
-        try {
-            System.out.println("entrei no try ");
-            keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keystore.load(is, password.toCharArray());
-            return keystore;
-        } catch (Exception e) {
-            System.out.println("Error loading keystore (invalid password?)");
-            System.exit(0);
-            return null;
-        }
-    }*/
 
 
 }

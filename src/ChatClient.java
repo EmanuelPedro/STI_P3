@@ -4,8 +4,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.net.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -19,22 +18,19 @@ public class ChatClient implements Runnable
     private DataInputStream  console   = null;
     private DataOutputStream streamOut = null;
     private ChatClientThread client    = null;
-    private Encryption encryption = null;
-    private String username = null;
-    private String myCertificateText;       //contem os detalhes do certificado gerado
     private X509Certificate myCertificate;
     private X509Certificate serverCertificate;
     private KeyStore keystore;
+    private String myCertificateText;       //contem os detalhes do certificado gerado
+    SecretKey clientSecretKey = null;
     String keyPass = null;
     String keyAlias = null;
-    SecretKey clientSecretKey = null;
-    int Step=0;
 
     public ChatClient(String serverName, int serverPort, String certname, String servercertname, String keystorename, String keystorepass, String keystorealias) {
         System.out.println("Establishing connection to server...");
-        //username = user;
 
         try {
+            // Establishes connection with server (name and port)
             socket = new Socket(serverName, serverPort);
             System.out.println("Connected to server: " + socket);
 
@@ -47,9 +43,6 @@ public class ChatClient implements Runnable
 
             keyPass = keystorepass;
             keyAlias = keystorealias;
-
-            //System.out.println("myCertificateText = " + myCertificateText);
-            // Establishes connection with server (name and port)
 
             start();
         } catch (UnknownHostException uhe) {
@@ -123,94 +116,110 @@ public class ChatClient implements Runnable
         }
     }
 
-    public void run() {
-
-
+    public void run()
+    {
         String message;
-        while (thread != null) {
+        Encryption encryption = new Encryption();
+        while (thread != null)
+        {
+
             try {
+
+                // 1. manda certificado para server (myCertificateText)
+                streamOut.writeUTF(myCertificateText);
+                //System.out.println("\nCertificate sent! ");
+
+                // 2. envia chave simetrica encriptada com chave publica do servidor
+                SecretKey secret = Encryption.getSecret();
+                clientSecretKey = secret;
+                //byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
+                String clientSecretKeyText = Base64.getEncoder().encodeToString(clientSecretKey.getEncoded());
+                streamOut.writeUTF(clientSecretKeyText);
+                //System.out.println("Symetric Key sent! ");
+                ////// TEST encrypt using String
+                // String encryptPublicKeyText = encryption.encrypt(Base64.getEncoder().encodeToString(secret.getEncoded()), serverCertificate.getPublicKey(), "RSA");
+                // System.out.println("\n ==> encryptPublicKeyText = " + encryptPublicKeyText);
+                //////////////////////////////////////////
+
+
+                // 3. manda assinatura
+                //String signMessage = null;
+                String signMessage = encryption.signMessage(clientSecretKey, (PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
+                streamOut.writeUTF(signMessage);
+
+                // 4. lê e envia mensagem encryptado
                 message = console.readLine();
+                //byte[] encryptMessage = encryption.encrypt2(message.getBytes(), clientSecretKey, "AES");
+                //String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
 
+                // generate hash message, messageDigest para textos longos
+                MessageDigest digest = MessageDigest.getInstance("MD5");
+                digest.update(message.getBytes());
+                byte hashedBytes[] = digest.digest();
 
-                try {
-                    encryption = new Encryption();
-                    // Sends message from console to server
-                    //    if(Step==0) {
-                    // 1. manda certificado para server (myCertificateText)
-
-                    SecretKey secret = Encryption.getSecret();
-                    clientSecretKey = secret;
-                  //  System.out.println(secret + "" + clientSecretKey);
-                    byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
-                    String encryptPublicKeyText = new String(encryptPublicKey, "UTF-8");
-                    streamOut.writeUTF(message);
-                    streamOut.writeUTF(myCertificateText);
-                    System.out.println(">>>>>"+encryptPublicKeyText);
-                    streamOut.writeUTF(encryptPublicKeyText);
-                   // streamOut.flush();
-                    //streamOut.write(encryptPublicKey);
-                    //streamOut.flush();
-
-
-                } catch (Exception e) {
-                    System.out.println("Error sending string to server: " + e.getMessage());
+                StringBuffer stringBuffer = new StringBuffer();
+                for (int i = 0; i < hashedBytes.length; i++) {
+                    stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
                 }
+
+                String finalMessage = message + "|" + stringBuffer.toString();
+
+                streamOut.writeUTF(finalMessage);
+                //streamOut.writeUTF(message);
+                //System.out.println("Message sent! ");
 
                 streamOut.flush();
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (UnrecoverableKeyException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            } catch (SignatureException e) {
+                e.printStackTrace();
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
             }
         }
-
-        //Step++;
-        //  }
-        //       if(Step==1){
-        // 2. manda chave secreta (clientSecretKey)
-
-        //  Step=2;
-           /*     }
-                if(Step==2){
-                    Step=3;
-                    break;
-                }
-                if(Step==3){
-                    break;
-                }*/
-        //String s = Base64.getEncoder().encodeToString(secret.getEncoded());
-        //System.out.println("Secret key = " + s);
-        //System.out.println("serverCertificate publickey = " + serverCertificate.getPublicKey());
-
-
-        //String string_encryptPublicKey = new String(encryptPublicKey,StandardCharsets.UTF_8);
-        //System.out.println("encryptPublicKey text format = " + string_encryptPublicKey);
-
-
-        // 3. manda assinatura
-
-        // 4. manda a mensagem encriptada com hash
-
-        //message = console.readLine();
-        //streamOut.writeUTF(message);
-
-
-
-                /*message = console.readLine();
-                try {
-                    message = encryption.encrypt(message);
-                    streamOut.writeUTF(message);
-                    streamOut.writeUTF(encryption.signMessage(message));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                streamOut.flush();*/
-
-
     }
 
-    public void handle(byte[] certificate, byte[] publicKey, String message)
+    public void handle(String certificate, String publicKey, String signature, String message)
     {
-        System.out.println("temporariamente indisponivel");
+        try {
+            String sendedMessageID = message.substring(0, message.indexOf("|"));
+            String sendedMessage = sendedMessageID.substring(sendedMessageID.indexOf(":")+2);
+            String hashedMessage = message.substring(message.indexOf("|")+1);
+            //System.out.println("SMI = " + sendedMessageID);
+            //System.out.println("M = " + message);
+            //System.out.println("SM = " + sendedMessageID.substring(sendedMessageID.indexOf(":")+2));
+            //System.out.println("HM = " + message.substring(message.indexOf("|")+1));
+
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(sendedMessage.getBytes());
+            byte hashedBytes[] = digest.digest();
+
+            StringBuffer stringBuffer = new StringBuffer();
+            for (int i = 0; i < hashedBytes.length; i++) {
+                stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+
+            if (stringBuffer.toString().equals(hashedMessage)) {
+                // Receives message from server
+                if (sendedMessage.equals(".quit")) {
+                    // Leaving, quit command
+                    System.out.println("Exiting...Please press RETURN to exit ...");
+                    stop();
+                } else
+                    // else, writes message received from server to console
+                    System.out.println(sendedMessageID);
+            } else {
+                System.out.println("Message not valid! ");
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
 /*
 
         // Receives message from server
@@ -346,21 +355,16 @@ class ChatClientThread extends Thread
     public void run()
     {
         //chama esta função ao receber resposta do server
-        String message, clientID;
+        String message, cert, publicKey, signature;
         while (true)
         {   try
             {
-                int nCert, nPublicKey;
-                byte[] certificate = new byte[16000];
-                byte[] publicKey = new byte[1600];
-                nCert = streamIn.read(certificate);
-                nPublicKey = streamIn.read(publicKey);
+                cert = streamIn.readUTF();
+                publicKey = streamIn.readUTF();
+                signature = streamIn.readUTF();
                 message = streamIn.readUTF();
 
-                if ((nCert > 0) && (nPublicKey > 0))
-                {
-                    client.handle(certificate, publicKey, message);
-                }
+                client.handle(cert, publicKey, signature, message);
             }
             catch(IOException ioe)
             {
