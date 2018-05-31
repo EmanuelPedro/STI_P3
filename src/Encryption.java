@@ -148,7 +148,6 @@ public class Encryption {
 
     public String signMessage(SecretKey secretKey, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         byte[] TextSigned;
-        //System.out.println("Private key: " + privateKey);
 
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(privateKey);
@@ -157,13 +156,14 @@ public class Encryption {
         return encoder.encodeToString(TextSigned);
     }
 
-    public boolean isSigned(PublicKey pubKey, String signature, String plainText) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature dsa = Signature.getInstance("SHA1withDSA","SUN");
-        byte[] message = decoder.decode(plainText), signatureEncoded = decoder.decode(signature);
+    public boolean isSigned(PublicKey pubKey, Key key, String data) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+
         boolean signed = false;
-        dsa.initVerify(pubKey);
-        dsa.update(message, 0 , message.length);
-        signed = dsa.verify(signatureEncoded);
+
+        signature.initVerify(pubKey);
+        signature.update(key.getEncoded());
+        signed = signature.verify(data.getBytes());
         return signed;
     }
 

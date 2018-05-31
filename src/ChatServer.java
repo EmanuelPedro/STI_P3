@@ -180,17 +180,22 @@ public class ChatServer implements Runnable
 			clients[leaving_id].setSecretKey(secretKey);
 
 			// verify signature
-			// em falta
-
+			//boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
+//			Signature myVerifySign = null;
+//			myVerifySign = Signature.getInstance("SHA256withRSA");
+//			myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
+//			myVerifySign.update(clients[leaving_id].getSecretKey().getEncoded());
+//			boolean isSigned = myVerifySign.verify(signature.getBytes());
+//			if (isSigned)
+//				System.out.println("Signature valid! ");
+//			else
+//				System.out.println("Signature invalid! ");
 
 			// verify message
-
 			// generate hash message, messageDigest para textos longos
 			//String sender = message.substring(0, message.indexOf("|"));
 			String sendedMessage = message.substring(0, message.indexOf("|"));
 			String hashedMessage = message.substring(message.indexOf("|")+1);
-			//System.out.println("SM = " + sendedMessage);
-			//System.out.println("HM = " + hashedMessage);
 
 			MessageDigest digest = MessageDigest.getInstance("MD5");
 			digest.update(sendedMessage.getBytes());
@@ -217,7 +222,7 @@ public class ChatServer implements Runnable
 							clients[i].send(certificate);
 							clients[i].send(publicKey);
 							clients[i].send(signature);
-							clients[i].send(ID + ": " + "Client " + ID + " exits.." + "|" + hashedMessage);
+							clients[i].send("Client " + ID + " exits..");
 						}
 					remove(ID);
 				}
@@ -251,39 +256,6 @@ public class ChatServer implements Runnable
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-
-//		try {
-//			decryptMessage = encryption.decrypt(input);
-//
-//			if (decryptMessage.equals(".quit")) {
-//				int leaving_id = findClient(ID);
-//				// Client exits
-//
-//				clients[leaving_id].send(Integer.toString(ID));
-//				clients[leaving_id].send(encryption.encrypt(decryptMessage));
-//				clients[leaving_id].send(signature);
-//				clients[leaving_id].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
-//				// Notify remaing users
-//				for (int i = 0; i < clientCount; i++)
-//					if (i != leaving_id) {
-//						clients[i].send(Integer.toString(ID));
-//						clients[i].send(encryption.encrypt("Client " + ID + " exits.."));
-//						clients[i].send(signature);
-//						clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
-//					}
-//				remove(ID);
-//			} else {
-//				// Brodcast message for every other client online
-//				for (int i = 0; i < clientCount; i++) {
-//					clients[i].send(Integer.toString(ID));
-//					clients[i].send(encryption.encrypt(decryptMessage));
-//					clients[i].send(signature);
-//					clients[i].send(encryption.encoder.encodeToString(publicKey.getEncoded()));
-//				}
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 
 	}
 

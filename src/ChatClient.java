@@ -166,7 +166,6 @@ public class ChatClient implements Runnable
 
                 streamOut.writeUTF(finalMessage);
                 //streamOut.writeUTF(message);
-                //System.out.println("Message sent! ");
 
                 streamOut.flush();
             } catch (IOException e) {
@@ -188,77 +187,40 @@ public class ChatClient implements Runnable
     public void handle(String certificate, String publicKey, String signature, String message)
     {
         try {
-            String sendedMessageID = message.substring(0, message.indexOf("|"));
-            String sendedMessage = sendedMessageID.substring(sendedMessageID.indexOf(":")+2);
-            String hashedMessage = message.substring(message.indexOf("|")+1);
-            //System.out.println("SMI = " + sendedMessageID);
-            //System.out.println("M = " + message);
-            //System.out.println("SM = " + sendedMessageID.substring(sendedMessageID.indexOf(":")+2));
-            //System.out.println("HM = " + message.substring(message.indexOf("|")+1));
+            if (message.indexOf("|") == -1)
+                System.out.println(message);
+            else
+            {
+                String sendedMessageID = message.substring(0, message.indexOf("|"));
+                String sendedMessage = sendedMessageID.substring(sendedMessageID.indexOf(":")+2);
+                String hashedMessage = message.substring(message.indexOf("|")+1);
 
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            digest.update(sendedMessage.getBytes());
-            byte hashedBytes[] = digest.digest();
+                MessageDigest digest = MessageDigest.getInstance("MD5");
+                digest.update(sendedMessage.getBytes());
+                byte hashedBytes[] = digest.digest();
 
-            StringBuffer stringBuffer = new StringBuffer();
-            for (int i = 0; i < hashedBytes.length; i++) {
-                stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
+                StringBuffer stringBuffer = new StringBuffer();
+                for (int i = 0; i < hashedBytes.length; i++) {
+                    stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
+                }
+
+                if (stringBuffer.toString().equals(hashedMessage)) {
+                    // Receives message from server
+                    if (sendedMessage.equals(".quit")) {
+                        // Leaving, quit command
+                        System.out.println("Exiting...Please press RETURN to exit ...");
+                        stop();
+                    } else
+                        System.out.println(sendedMessageID);
+                } else {
+                    System.out.println("Message not valid! ");
+                }
             }
 
-            if (stringBuffer.toString().equals(hashedMessage)) {
-                // Receives message from server
-                if (sendedMessage.equals(".quit")) {
-                    // Leaving, quit command
-                    System.out.println("Exiting...Please press RETURN to exit ...");
-                    stop();
-                } else
-                    // else, writes message received from server to console
-                    System.out.println(sendedMessageID);
-            } else {
-                System.out.println("Message not valid! ");
-            }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-/*
 
-        // Receives message from server
-        //encryption = new Encryption();
-        String decryptMessage;
-        boolean msgSigned;
-        //System.out.println("ClientID before decrypt = " +clientID);
-        //System.out.println("Message before decrypt = " +msg);
-        //System.out.println("Signature before decrypt = " +signature);
-        //System.out.println("publicKey before decrypt = " +publicKey);
-        try {
-            //String client = encryption.decrypt(clientID);
-            decryptMessage = encryption.decrypt(msg);
-            //System.out.println("Client ID after decrypt = " + client);
-            //System.out.println("Message after decrypt = " + decryptMessage);
-            msgSigned = encryption.isSigned(encryption.getSendedPublicKey(publicKey), signature, msg);
-
-            if (msgSigned)
-                System.out.println("Message signed! ");
-            else
-                System.out.println("Message not signed! ");
-
-            if (decryptMessage.equals(".quit"))
-            {
-                // Leaving, quit command
-                System.out.println("Exiting...Please press RETURN to exit ...");
-                stop();
-            }
-            else {
-                // else, writes message received from server to console
-                System.out.println(clientID + ": " + decryptMessage);
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        //System.out.println("Message decrypted: " + decryptMessage);
-*/
     }
 
     // Inits new client thread
