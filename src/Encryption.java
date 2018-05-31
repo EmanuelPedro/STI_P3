@@ -110,6 +110,7 @@ public class Encryption {
         }
 
         //String encryptedText = encoder.encodeToString(encryptedByte);
+
         return encryptedByte;
     }
 

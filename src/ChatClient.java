@@ -144,13 +144,19 @@ public class ChatClient implements Runnable
 
                 // 3. manda assinatura
                 //String signMessage = null;
-                String signMessage = encryption.signMessage(clientSecretKey, (PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
-                streamOut.writeUTF(signMessage);
+                //String signMessage = encryption.signMessage(clientSecretKey, (PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
+                Signature signature = Signature.getInstance("SHA256withRSA");
+                signature.initSign((PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
+                signature.update(clientSecretKey.getEncoded());
+                byte[] TextSigned = signature.sign();
+                byte[] encryptMessage = encryption.encrypt2(TextSigned, clientSecretKey, "AES");
+                String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
+                streamOut.writeUTF(encryptMessageText);
 
                 // 4. lê e envia mensagem encryptado
                 message = console.readLine();
-                //byte[] encryptMessage = encryption.encrypt2(message.getBytes(), clientSecretKey, "AES");
-                //String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
+                byte[] encryptMessage2 = encryption.encrypt2(message.getBytes(), clientSecretKey, "AES");
+                String encryptMessageText2 = Base64.getEncoder().encodeToString(encryptMessage2);
 
                 // generate hash message, messageDigest para textos longos
                 MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -164,7 +170,7 @@ public class ChatClient implements Runnable
 
                 String finalMessage = message + "|" + stringBuffer.toString();
 
-                streamOut.writeUTF(finalMessage);
+                streamOut.writeUTF(encryptMessageText2);
                 //streamOut.writeUTF(message);
 
                 streamOut.flush();
