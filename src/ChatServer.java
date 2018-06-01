@@ -289,7 +289,7 @@ public class ChatServer implements Runnable
 				remove(ID);
 
             }
-
+//TODO RENEW KEY
 
 }
 	public synchronized void remove(int ID)
