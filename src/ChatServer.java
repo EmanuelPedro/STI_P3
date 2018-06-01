@@ -169,7 +169,7 @@ public class ChatServer implements Runnable
 			boolean isCertValid = isValid(clients[leaving_id].getClientCertificate());
 			if (isCertValid) {
 				System.out.println("cert valid");
-			    goToDecrypt(ID,encryption,publicKey,leaving_id);
+			    goToDecrypt(ID,encryption,publicKey,leaving_id,signature);
 			}
 			else{
 				System.out.println("Cert not valid");
@@ -180,7 +180,7 @@ public class ChatServer implements Runnable
         }
 
 	}
-    public synchronized void goToDecrypt(int ID,Encryption encryption,String publicKey,int leaving_id) {
+    public synchronized void goToDecrypt(int ID,Encryption encryption,String publicKey,int leaving_id,String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 
 			byte[] decryptWithPrivateKey=new byte[0];
 			try {
@@ -200,7 +200,7 @@ public class ChatServer implements Runnable
 
 			// verify signature
 			//boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
-			/*Signature myVerifySign = null;
+			Signature myVerifySign = null;
 			System.out.println("Signature length = " + signature.getBytes().length);
 			System.out.println("Signature = " + signature);
 			myVerifySign = Signature.getInstance("SHA256withRSA");
@@ -211,7 +211,7 @@ public class ChatServer implements Runnable
 				System.out.println("Signature valid! ");
 			else
 				System.out.println("Signature invalid! ");
-*/
+
         //decrypt message:
         //byte[] decryptMessage, decodeMessage = Base64.getDecoder().decode(message);
 
