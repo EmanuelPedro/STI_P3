@@ -169,61 +169,75 @@ public class ChatServer implements Runnable
 			boolean isCertValid = isValid(clients[leaving_id].getClientCertificate());
 			if (isCertValid) {
 				System.out.println("cert valid");
-			    goToDecrypt(ID,encryption,publicKey,leaving_id,signature);
+			    goToDecrypt(ID,certificate,encryption,publicKey,leaving_id,signature,message);
 			}
 			else{
 				System.out.println("Cert not valid");
 			    System.exit(0);
 			}
 		}catch(Exception e){
-            System.out.println("ERROR on Certificade validation:");
+            System.out.println("ERROR on Certificade validation: "+e);
         }
 
 	}
-    public synchronized void goToDecrypt(int ID,Encryption encryption,String publicKey,int leaving_id,String signature) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public synchronized void goToDecrypt(int ID, String certificate,Encryption encryption,String publicKey,int leaving_id,String signature,String message) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 
-			byte[] decryptWithPrivateKey=new byte[0];
-			try {
-				decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/NoPadding");
-			}catch(Exception e){
-                System.out.println("ERROR ON DECRYPT"+e);
+        byte[] decryptWithPrivateKey = new byte[0];
+        boolean isSigned = false;
+        try {
+            decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/NoPadding");
+        } catch (Exception e) {
+            System.out.println("ERROR ON DECRYPT" + e);
+            clients[leaving_id].send(".quit");
+            remove(ID);
+            System.exit(0);
+
+        }
+
+        clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
+        //set client secretKey
+        SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
+        clients[leaving_id].setSecretKey(secretKey);
+
+        // verify signature
+        //boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
+      /*  Signature myVerifySign = null;
+        try {
+            System.out.println("Signature length = " + signature.getBytes().length);
+            System.out.println("Signature = " + signature);
+            myVerifySign = Signature.getInstance("SHA256withRSA");
+            myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
+            myVerifySign.update(clients[leaving_id].getSecretKey().getEncoded());
+            isSigned = myVerifySign.verify(signature.getBytes());
+            if (isSigned) {
+                System.out.println("Signature valid! ");
+                afterSign(ID,certificate,encryption,publicKey,leaving_id,signature,message);
+            } else {
+                System.out.println("Signature invalid! ");
                 clients[leaving_id].send(".quit");
                 remove(ID);
                 System.exit(0);
-
             }
+        } catch (Exception e) {
+            System.out.println("[ERROR] : Signature >> " + e);
+            clients[leaving_id].send(".quit");
+            remove(ID);
+        }*/
 
-            clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
-			//set client secretKey
-			SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
-			clients[leaving_id].setSecretKey(secretKey);
+    }
+    public synchronized void afterSign(int ID, String certificate,Encryption encryption,String publicKey,int leaving_id,String signature,String message) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 
-			// verify signature
-			//boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
-			Signature myVerifySign = null;
-			System.out.println("Signature length = " + signature.getBytes().length);
-			System.out.println("Signature = " + signature);
-			myVerifySign = Signature.getInstance("SHA256withRSA");
-			myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
-			myVerifySign.update(clients[leaving_id].getSecretKey().getEncoded());
-			boolean isSigned = myVerifySign.verify(signature.getBytes());
-			if (isSigned)
-				System.out.println("Signature valid! ");
-			else
-				System.out.println("Signature invalid! ");
+        byte[] decryptMessage, decodeMessage = Base64.getDecoder().decode(message);
 
-        //decrypt message:
-        //byte[] decryptMessage, decodeMessage = Base64.getDecoder().decode(message);
-
-        //decryptMessage = encryption.decrypt2(decodeMessage, clients[leaving_id].getSecretKey(), "AES");
-        //String decrypMessageText = Base64.getEncoder().encodeToString(decryptMessage);
-        //System.out.println("Decrypted message = " + decrypMessageText);
+        decryptMessage = encryption.decrypt2(decodeMessage, clients[leaving_id].getSecretKey(), "AES");
+        String decrypMessageText = Base64.getEncoder().encodeToString(decryptMessage);
+        System.out.println("Decrypted message = " + decrypMessageText);
 
         // verify message
-        // generate hash message, messageDigest para textos longos
-        //String sender = message.substring(0, message.indexOf("|"));
+        //generate hash message, messageDigest para textos longos
+        String sender = message.substring(0, message.indexOf("|"));
 
-			/*String sendedMessage = message.substring(0, message.indexOf("|"));
+			String sendedMessage = message.substring(0, message.indexOf("|"));
 			String hashedMessage = message.substring(message.indexOf("|")+1);
 
 			MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -272,14 +286,12 @@ public class ChatServer implements Runnable
 				clients[leaving_id].send(publicKey);
 				clients[leaving_id].send(signature);
 				clients[leaving_id].send(ID + ": " + ".quit" + "|" + hashedMessage);
-			}
+				remove(ID);
+
+            }
+
 
 }
-		catch (Exception e) {
-                e.printStackTrace();
-                }
-                */
-    }
 	public synchronized void remove(int ID)
 	{
 		int pos = findClient(ID);
