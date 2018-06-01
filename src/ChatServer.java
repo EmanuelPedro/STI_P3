@@ -165,6 +165,7 @@ public class ChatServer implements Runnable
 				System.out.println("cert received");
 			else
 				System.out.println("Cert not received");
+
 			boolean isCertValid = isValid(clients[leaving_id].getClientCertificate());
 			if (isCertValid) {
 				System.out.println("cert valid");
@@ -172,7 +173,7 @@ public class ChatServer implements Runnable
 			}
 			else{
 				System.out.println("Cert not valid");
-			    System.exit(0)
+			    System.exit(0);
 			}
 		}catch(Exception e){
             System.out.println("ERROR on Certificade validation:");
@@ -183,7 +184,7 @@ public class ChatServer implements Runnable
 
 			byte[] decryptWithPrivateKey=new byte[0];
 			try {
-				decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA");
+				decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/NoPadding");
 			}catch(Exception e){
                 System.out.println("ERROR ON DECRYPT"+e);
                 clients[leaving_id].send(".quit");

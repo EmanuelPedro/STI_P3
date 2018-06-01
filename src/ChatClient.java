@@ -132,7 +132,7 @@ public class ChatClient implements Runnable
                 // 2. envia chave simetrica encriptada com chave publica do servidor
                 SecretKey secret = Encryption.getSecret();
                 clientSecretKey = secret;
-                //byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
+                byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/NoPadding");
                 String clientSecretKeyText = Base64.getEncoder().encodeToString(clientSecretKey.getEncoded());
                 streamOut.writeUTF(clientSecretKeyText);
                 //System.out.println("Symetric Key sent! ");

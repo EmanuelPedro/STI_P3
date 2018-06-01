@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="37e0df82-0cdd-49b0-ad3e-c85308a315fe" name="Default" comment="erro do tamnaho no encriptor">
-      <change afterPath="$PROJECT_DIR$/desktop.ini" afterDir="false" />
+    <list default="true" id="37e0df82-0cdd-49b0-ad3e-c85308a315fe" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ChatClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ChatServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ChatServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Encryption.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Encryption.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Practical Assignment #3.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/sti/Main.java" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -42,8 +39,8 @@
       <file leaf-file-name="ChatClient.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="82">
-              <caret line="282" column="30" selection-start-line="282" selection-start-column="30" selection-end-line="282" selection-end-column="30" />
+            <state relative-caret-position="92">
+              <caret line="134" column="121" selection-start-line="134" selection-start-column="118" selection-end-line="134" selection-end-column="121" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -51,11 +48,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ChatServer.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Cipher.class" pinned="false" current-in-tab="false">
+        <entry file="jrt://C:/Program Files/Java/jdk-10.0.1!/java.base/javax/crypto/Cipher.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="83">
+              <caret line="770" column="25" selection-start-line="770" selection-start-column="25" selection-end-line="770" selection-end-column="25" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ChatServer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="190" column="31" selection-start-line="190" selection-start-column="31" selection-end-line="190" selection-end-column="31" />
+            <state relative-caret-position="92">
+              <caret line="186" column="160" lean-forward="true" selection-start-line="186" selection-start-column="143" selection-end-line="186" selection-end-column="160" />
               <folding>
                 <element signature="method#loadCert#0;class#ChatServer#0" />
                 <element signature="method#loadKeystore#0;class#ChatServer#0" />
@@ -91,14 +97,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Encryption.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Encryption.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Encryption.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="548">
-              <caret line="144" selection-start-line="144" selection-end-line="144" />
+            <state relative-caret-position="92">
+              <caret line="92" column="56" selection-start-line="92" selection-start-column="56" selection-end-line="92" selection-end-column="56" />
               <folding>
                 <element signature="method#decrypt#0;class#Encryption#0" />
-                <element signature="method#encrypt2#0;class#Encryption#0" />
                 <element signature="method#signMessage#0;class#Encryption#0" />
                 <element signature="method#isSigned#0;class#Encryption#0" />
                 <element signature="method#getSendedPublicKey#0;class#Encryption#0" />
@@ -141,13 +146,13 @@
       <find>RSA/ECB</find>
       <find>dec</find>
       <find>hash</find>
-      <find>rsa</find>
-      <find>ras</find>
       <find>RSA</find>
       <find>init</find>
       <find>static K</find>
       <find>dsa</find>
       <find>secretKeySpec</find>
+      <find>ras</find>
+      <find>rsa</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -156,10 +161,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/ChatClient.java" />
         <option value="$PROJECT_DIR$/src/SymmetricEncrypt.java" />
-        <option value="$PROJECT_DIR$/src/Encryption.java" />
         <option value="$PROJECT_DIR$/src/ChatServer.java" />
+        <option value="$PROJECT_DIR$/src/ChatClient.java" />
+        <option value="$PROJECT_DIR$/src/Encryption.java" />
       </list>
     </option>
   </component>
@@ -172,7 +177,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
     <option name="width" value="697" />
     <option name="height" value="735" />
@@ -237,7 +242,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.ChatServer">
+  <component name="RunManager" selected="Application.ChatClient">
     <configuration name="ChatClient" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ChatClient" />
       <module name="STI_P3" />
@@ -343,7 +348,7 @@
       <workItem from="1527596850276" duration="29291000" />
       <workItem from="1527763032402" duration="1166000" />
       <workItem from="1527805607331" duration="4692000" />
-      <workItem from="1527846754428" duration="5873000" />
+      <workItem from="1527846754428" duration="6826000" />
     </task>
     <task id="LOCAL-00001" summary="enunciado">
       <created>1527268365871</created>
@@ -387,14 +392,21 @@
       <option name="project" value="LOCAL" />
       <updated>1527710957851</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="alteracoes no chatServer">
+      <created>1527852892345</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1527852892346</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45959000" />
+    <option name="totallyTimeSpent" value="46912000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="0" width="697" height="735" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
@@ -420,7 +432,7 @@
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info id="Favorites" order="2" sideWeight="0.21385542" side_tool="true" weight="0.51648355" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49848714" visible="true" weight="0.4237856" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49848714" visible="true" weight="0.41749176" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -500,7 +512,8 @@
     <MESSAGE value="alterações no run do client" />
     <MESSAGE value="alterações no handle do server" />
     <MESSAGE value="erro do tamnaho no encriptor" />
-    <option name="LAST_COMMIT_MESSAGE" value="erro do tamnaho no encriptor" />
+    <MESSAGE value="alteracoes no chatServer" />
+    <option name="LAST_COMMIT_MESSAGE" value="alteracoes no chatServer" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -811,34 +824,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="jrt://C:/Program Files/Java/jdk-10.0.1!/java.base/javax/crypto/Cipher.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="770" column="25" selection-start-line="770" selection-start-column="25" selection-end-line="770" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82">
-          <caret line="282" column="30" selection-start-line="282" selection-start-column="30" selection-end-line="282" selection-end-column="30" />
+        <state relative-caret-position="92">
+          <caret line="134" column="121" selection-start-line="134" selection-start-column="118" selection-end-line="134" selection-end-column="121" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/Encryption.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="548">
-          <caret line="144" selection-start-line="144" selection-end-line="144" />
-          <folding>
-            <element signature="method#decrypt#0;class#Encryption#0" />
-            <element signature="method#encrypt2#0;class#Encryption#0" />
-            <element signature="method#signMessage#0;class#Encryption#0" />
-            <element signature="method#isSigned#0;class#Encryption#0" />
-            <element signature="method#getSendedPublicKey#0;class#Encryption#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ChatServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="190" column="31" selection-start-line="190" selection-start-column="31" selection-end-line="190" selection-end-column="31" />
+        <state relative-caret-position="92">
+          <caret line="186" column="160" lean-forward="true" selection-start-line="186" selection-start-column="143" selection-end-line="186" selection-end-column="160" />
           <folding>
             <element signature="method#loadCert#0;class#ChatServer#0" />
             <element signature="method#loadKeystore#0;class#ChatServer#0" />
@@ -869,6 +875,19 @@
             <element signature="method#run#0;class#ChatServerThread#0" />
             <element signature="method#open#0;class#ChatServerThread#0" />
             <element signature="method#close#0;class#ChatServerThread#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/Encryption.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="92">
+          <caret line="92" column="56" selection-start-line="92" selection-start-column="56" selection-end-line="92" selection-end-column="56" />
+          <folding>
+            <element signature="method#decrypt#0;class#Encryption#0" />
+            <element signature="method#signMessage#0;class#Encryption#0" />
+            <element signature="method#isSigned#0;class#Encryption#0" />
+            <element signature="method#getSendedPublicKey#0;class#Encryption#0" />
           </folding>
         </state>
       </provider>

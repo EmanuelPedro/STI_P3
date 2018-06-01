@@ -90,7 +90,7 @@ public class Encryption {
             if(algorithm.equals("AES")){
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters());
             }
-            else if (algorithm.equals("RSA")) {
+            else if (algorithm.equals("RSA/ECB/NoPadding")) {
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             }
             //System.out.println(plainText.length);
@@ -125,7 +125,7 @@ public class Encryption {
             if(algorithm.equals("AES")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey,cipher.getParameters());
             }
-            else if(algorithm.equals("RSA")){
+            else if(algorithm.equals("RSA/ECB/NoPadding")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey);
             }
 
