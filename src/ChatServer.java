@@ -166,22 +166,40 @@ public class ChatServer implements Runnable
 			else
 				System.out.println("Cert not received");
 			boolean isCertValid = isValid(clients[leaving_id].getClientCertificate());
-			if (isCertValid)
+			if (isCertValid) {
 				System.out.println("cert valid");
-			else
+			    goToDecrypt(ID,encryption,publicKey,leaving_id);
+			}
+			else{
 				System.out.println("Cert not valid");
+			    System.exit(0)
+			}
+		}catch(Exception e){
+            System.out.println("ERROR on Certificade validation:");
+        }
 
-			//byte[] decryptWithPrivateKey;
-			//decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
+	}
+    public synchronized void goToDecrypt(int ID,Encryption encryption,String publicKey,int leaving_id) {
 
-			clients[leaving_id].setClientSecretKey(publicKey.getBytes());
+			byte[] decryptWithPrivateKey=new byte[0];
+			try {
+				decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA");
+			}catch(Exception e){
+                System.out.println("ERROR ON DECRYPT"+e);
+                clients[leaving_id].send(".quit");
+                remove(ID);
+                System.exit(0);
+
+            }
+
+            clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
 			//set client secretKey
-			SecretKeySpec secretKey = new SecretKeySpec(publicKey.getBytes(), "AES");
+			SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
 			clients[leaving_id].setSecretKey(secretKey);
 
 			// verify signature
 			//boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
-			Signature myVerifySign = null;
+			/*Signature myVerifySign = null;
 			System.out.println("Signature length = " + signature.getBytes().length);
 			System.out.println("Signature = " + signature);
 			myVerifySign = Signature.getInstance("SHA256withRSA");
@@ -192,17 +210,17 @@ public class ChatServer implements Runnable
 				System.out.println("Signature valid! ");
 			else
 				System.out.println("Signature invalid! ");
+*/
+        //decrypt message:
+        //byte[] decryptMessage, decodeMessage = Base64.getDecoder().decode(message);
 
-			//decrypt message:
-			//byte[] decryptMessage, decodeMessage = Base64.getDecoder().decode(message);
+        //decryptMessage = encryption.decrypt2(decodeMessage, clients[leaving_id].getSecretKey(), "AES");
+        //String decrypMessageText = Base64.getEncoder().encodeToString(decryptMessage);
+        //System.out.println("Decrypted message = " + decrypMessageText);
 
-			//decryptMessage = encryption.decrypt2(decodeMessage, clients[leaving_id].getSecretKey(), "AES");
-			//String decrypMessageText = Base64.getEncoder().encodeToString(decryptMessage);
-			//System.out.println("Decrypted message = " + decrypMessageText);
-
-			// verify message
-			// generate hash message, messageDigest para textos longos
-			//String sender = message.substring(0, message.indexOf("|"));
+        // verify message
+        // generate hash message, messageDigest para textos longos
+        //String sender = message.substring(0, message.indexOf("|"));
 
 			/*String sendedMessage = message.substring(0, message.indexOf("|"));
 			String hashedMessage = message.substring(message.indexOf("|")+1);
@@ -253,15 +271,14 @@ public class ChatServer implements Runnable
 				clients[leaving_id].send(publicKey);
 				clients[leaving_id].send(signature);
 				clients[leaving_id].send(ID + ": " + ".quit" + "|" + hashedMessage);
-			}*/
+			}
 
-		}
+}
 		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
+                e.printStackTrace();
+                }
+                */
+    }
 	public synchronized void remove(int ID)
 	{
 		int pos = findClient(ID);
