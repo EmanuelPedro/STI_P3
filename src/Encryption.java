@@ -1,4 +1,5 @@
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.security.*;
@@ -21,7 +22,8 @@ public class Encryption {
         KeyPairGenerator keyPairGen;
         KeyPair pair;
         byte[] key = defaultPass.getBytes();
-        secret = new SecretKeySpec(key, "SHA1withRSA");
+        secret = new SecretKeySpec(key, "AES");
+
         encoder = Base64.getEncoder();
         decoder = Base64.getDecoder();
         try {
@@ -51,6 +53,8 @@ public class Encryption {
         }
 
         SecretKey secretKey = keyGen.generateKey();
+
+
         return secretKey;
     }
 
@@ -77,21 +81,21 @@ public class Encryption {
         return new String(newData);
     }
 
-    public byte[] encrypt2(byte[] plainText, Key secretKey, String algorithm) throws UnsupportedEncodingException {
+    public byte[] encrypt2(byte[] plainText, Key secretKey2, String algorithm) throws UnsupportedEncodingException {
         String text = new String(plainText);
         //System.out.println("Valor de plaintext = " + encoder.encodeToString(plainText));    // byte -> string
         //System.out.println("Valor de key = " + encoder.encodeToString(secretKey.getEncoded()));     //key -> string
         byte[] encryptedByte = new byte[200];
         System.out.println("Length data encrypt = " + plainText.length);
-        System.out.println("Length key encrypt = " + secretKey.getEncoded().length);
+        System.out.println("Length key encrypt = " + secretKey2.getEncoded().length);
 
         try {
             cipher = Cipher.getInstance(algorithm);
             if(algorithm.equals("AES")){
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters());
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey2, cipher.getParameters());
             }
-            else if (algorithm.equals("RSA/ECB/NoPadding")) {
-                cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            else if (algorithm.equals("RSA/ECB/PKCS1Padding")) {
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey2);
             }
             //System.out.println(plainText.length);
             encryptedByte = cipher.doFinal(plainText);
@@ -125,7 +129,7 @@ public class Encryption {
             if(algorithm.equals("AES")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey,cipher.getParameters());
             }
-            else if(algorithm.equals("RSA/ECB/NoPadding")){
+            else if(algorithm.equals("RSA/ECB/PKCS1Padding")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey);
             }
 

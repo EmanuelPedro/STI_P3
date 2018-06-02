@@ -185,7 +185,7 @@ public class ChatServer implements Runnable
         byte[] decryptWithPrivateKey = new byte[0];
         boolean isSigned = false;
         try {
-            decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/NoPadding");
+            decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
         } catch (Exception e) {
             System.out.println("ERROR ON DECRYPT" + e);
             clients[leaving_id].send(".quit");
@@ -201,9 +201,11 @@ public class ChatServer implements Runnable
 
         // verify signature
         //boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
-      /*  Signature myVerifySign = null;
+        Signature myVerifySign = null;
         try {
-            System.out.println("Signature length = " + signature.getBytes().length);
+            System.out.println("1>>Signature length = " + signature.getBytes().length);
+
+
             System.out.println("Signature = " + signature);
             myVerifySign = Signature.getInstance("SHA256withRSA");
             myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
@@ -222,7 +224,8 @@ public class ChatServer implements Runnable
             System.out.println("[ERROR] : Signature >> " + e);
             clients[leaving_id].send(".quit");
             remove(ID);
-        }*/
+        }
+
 
     }
     public synchronized void afterSign(int ID, String certificate,Encryption encryption,String publicKey,int leaving_id,String signature,String message) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
@@ -412,7 +415,8 @@ class ChatServerThread extends Thread
 
 	public SecretKeySpec getSecretKey() { return secretKey; }
 
-	public void setSecretKey(SecretKeySpec secretKey) { this.secretKey = secretKey; }
+	public void setSecretKey(SecretKeySpec secretKey) { this.secretKey = secretKey;
+        }
 
 	public X509Certificate getClientCertificate() { return clientCertificate; }
 
@@ -451,6 +455,7 @@ class ChatServerThread extends Thread
 				certificate = streamIn.readUTF();
 				publicKey = streamIn.readUTF();
 				signature = streamIn.readUTF();
+
 				message= streamIn.readUTF();
 
 				server.handle(ID, certificate, publicKey, signature, message);

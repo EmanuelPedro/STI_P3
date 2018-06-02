@@ -115,65 +115,75 @@ public class ChatClient implements Runnable
             return null;
         }
     }
+    public void sendSignature(String message,Encryption encryption) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, InvalidKeyException, SignatureException {
+        // 3. manda assinatura
+        //String signMessage = null;
+        //String signMessage = encryption.signMessage(clientSecretKey, (PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign((PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
+        signature.update(clientSecretKey.getEncoded());
+        byte[] TextSigned = signature.sign();
+        byte[] encryptMessage = encryption.encrypt2(TextSigned, clientSecretKey, "AES");
+        String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
+        streamOut.writeUTF(encryptMessageText);
+        readEncrMessage(message,encryption);
+    }
+    public void readEncrMessage(String message,Encryption encryption) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, InvalidKeyException, SignatureException {
+        // 4. lê e envia mensagem encryptado
+        message = console.readLine();
+        byte[] encryptMessage2 = encryption.encrypt2(message.getBytes(), clientSecretKey, "AES");
+        String encryptMessageText2 = Base64.getEncoder().encodeToString(encryptMessage2);
+
+        // generate hash message, messageDigest para textos longos
+        MessageDigest digest = MessageDigest.getInstance("MD5");
+        digest.update(message.getBytes());
+        byte hashedBytes[] = digest.digest();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < hashedBytes.length; i++) {
+            stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
+        }
+
+        String finalMessage = message + "|" + stringBuffer.toString();
+
+        streamOut.writeUTF(encryptMessageText2);
+        //streamOut.writeUTF(message);
+
+        streamOut.flush();
+    }
+    public void sendSimmetricKeys(String message,Encryption encryption) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, InvalidKeyException, SignatureException {
+        // 2. envia chave simetrica encriptada com chave publica do servidor
+        //SecretKey secret = Encryption.getSecret();
+        clientSecretKey =  Encryption.getSecret();
+        System.out.println("CLIENTSECRET:"+clientSecretKey.getEncoded().length);
+        byte[] encryptPublicKey = encryption.encrypt2(clientSecretKey.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
+        String clientSecretKeyText = Base64.getEncoder().encodeToString(clientSecretKey.getEncoded());
+
+        streamOut.writeUTF(clientSecretKeyText);
+        //System.out.println("Symetric Key sent! ");
+        ////// TEST encrypt using String
+        // String encryptPublicKeyText = encryption.encrypt(Base64.getEncoder().encodeToString(secret.getEncoded()), serverCertificate.getPublicKey(), "RSA");
+        // System.out.println("\n ==> encryptPublicKeyText = " + encryptPublicKeyText);
+        //////////////////////////////////////////
+
+        sendSignature(message,encryption);
+
+    }
 
     public void run()
     {
-        String message;
-        Encryption encryption = new Encryption();
+        String message = null;
+
         while (thread != null)
         {
 
             try {
-
+                Encryption encryption = new Encryption();
                 // 1. manda certificado para server (myCertificateText)
                 streamOut.writeUTF(myCertificateText);
                 //System.out.println("\nCertificate sent! ");
+                sendSimmetricKeys(message,encryption);
 
-                // 2. envia chave simetrica encriptada com chave publica do servidor
-                SecretKey secret = Encryption.getSecret();
-                clientSecretKey = secret;
-                byte[] encryptPublicKey = encryption.encrypt2(secret.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/NoPadding");
-                String clientSecretKeyText = Base64.getEncoder().encodeToString(clientSecretKey.getEncoded());
-                streamOut.writeUTF(clientSecretKeyText);
-                //System.out.println("Symetric Key sent! ");
-                ////// TEST encrypt using String
-                // String encryptPublicKeyText = encryption.encrypt(Base64.getEncoder().encodeToString(secret.getEncoded()), serverCertificate.getPublicKey(), "RSA");
-                // System.out.println("\n ==> encryptPublicKeyText = " + encryptPublicKeyText);
-                //////////////////////////////////////////
-
-
-                // 3. manda assinatura
-                //String signMessage = null;
-                //String signMessage = encryption.signMessage(clientSecretKey, (PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
-                Signature signature = Signature.getInstance("SHA256withRSA");
-                signature.initSign((PrivateKey)keystore.getKey(keyAlias, keyPass.toCharArray()));
-                signature.update(clientSecretKey.getEncoded());
-                byte[] TextSigned = signature.sign();
-                byte[] encryptMessage = encryption.encrypt2(TextSigned, clientSecretKey, "AES");
-                String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
-                streamOut.writeUTF(encryptMessageText);
-
-                // 4. lê e envia mensagem encryptado
-                message = console.readLine();
-                byte[] encryptMessage2 = encryption.encrypt2(message.getBytes(), clientSecretKey, "AES");
-                String encryptMessageText2 = Base64.getEncoder().encodeToString(encryptMessage2);
-
-                // generate hash message, messageDigest para textos longos
-                MessageDigest digest = MessageDigest.getInstance("MD5");
-                digest.update(message.getBytes());
-                byte hashedBytes[] = digest.digest();
-
-                StringBuffer stringBuffer = new StringBuffer();
-                for (int i = 0; i < hashedBytes.length; i++) {
-                    stringBuffer.append(Integer.toString((hashedBytes[i] & 0xff) + 0x100, 16).substring(1));
-                }
-
-                String finalMessage = message + "|" + stringBuffer.toString();
-
-                streamOut.writeUTF(encryptMessageText2);
-                //streamOut.writeUTF(message);
-
-                streamOut.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (NoSuchAlgorithmException e) {
