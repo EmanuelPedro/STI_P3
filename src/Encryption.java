@@ -152,35 +152,4 @@ public class Encryption {
         return decryptedByte;
     }
 
-    public String signMessage(SecretKey secretKey, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        byte[] TextSigned;
-
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initSign(privateKey);
-        signature.update(secretKey.getEncoded());
-        TextSigned = signature.sign();
-        return Base64.getEncoder().encodeToString(TextSigned);
-    }
-
-    public boolean isSigned(PublicKey pubKey, Key key, String data) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("SHA256withRSA");
-
-        boolean signed = false;
-
-        signature.initVerify(pubKey);
-        signature.update(key.getEncoded());
-        signed = signature.verify(data.getBytes());
-        return signed;
-    }
-
-    public PublicKey getSendedPublicKey(String pubKey) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] pubKeyEncoded = decoder.decode(pubKey);
-        X509EncodedKeySpec pubKeySpec;
-        KeyFactory keyFactory;
-        pubKeySpec = new X509EncodedKeySpec(pubKeyEncoded);
-        keyFactory = KeyFactory.getInstance("DSA", "SUN");
-        return keyFactory.generatePublic(pubKeySpec);
-    }
-
-
 }

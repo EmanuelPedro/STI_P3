@@ -26,6 +26,7 @@ public class ChatClient implements Runnable
     String keyPass = null;
     String keyAlias = null;
 
+
     public ChatClient(String serverName, int serverPort, String certname, String servercertname, String keystorename, String keystorepass, String keystorealias) {
         System.out.println("Establishing connection to server...");
 
@@ -125,6 +126,7 @@ public class ChatClient implements Runnable
         byte[] TextSigned = signature.sign();
         byte[] encryptMessage = encryption.encrypt2(TextSigned, clientSecretKey, "AES");
         String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
+        System.out.println(">>>>>>>>>SENDSIGNATURE"+TextSigned);
         streamOut.writeUTF(encryptMessageText);
         readEncrMessage(message,encryption);
     }
@@ -203,6 +205,7 @@ public class ChatClient implements Runnable
     public void handle(String certificate, String publicKey, String signature, String message)
     {
         try {
+
             if (message.indexOf("|") == -1)
                 System.out.println(message);
             else
@@ -226,7 +229,13 @@ public class ChatClient implements Runnable
                         // Leaving, quit command
                         System.out.println("Exiting...Please press RETURN to exit ...");
                         stop();
-                    } else
+                    }
+                    if(sendedMessage.equals(".renovatingKey")){
+                        System.out.println("[ALERT]RENOVATING KEY");
+                       // sendSimmetricKeys(message,encryption);
+
+                    }
+                    else
                         System.out.println(sendedMessageID);
                 } else {
                     System.out.println("Message not valid! ");
@@ -287,6 +296,7 @@ public class ChatClient implements Runnable
                                 //    IP   Porto   username   certName   serverCertname   keystroename   keystroepass   keystorealias
             client = new ChatClient(args[0], Integer.parseInt(args[1]), args[2], args[3], args[4], args[5], args[6]);
     }
+
 
 }
 
@@ -351,5 +361,6 @@ class ChatClientThread extends Thread
             }
         }
     }
+
 }
 
