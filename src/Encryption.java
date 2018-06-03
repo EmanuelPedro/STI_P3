@@ -94,7 +94,7 @@ public class Encryption {
             if(algorithm.equals("AES")){
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey2, cipher.getParameters());
             }
-            else if (algorithm.equals("RSA/ECB/PKCS1Padding")) {
+            else if (algorithm.equals("RSA/ECB/NoPadding")) {
                 cipher.init(Cipher.ENCRYPT_MODE, secretKey2);
             }
             //System.out.println(plainText.length);
@@ -129,23 +129,24 @@ public class Encryption {
             if(algorithm.equals("AES")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey,cipher.getParameters());
             }
-            else if(algorithm.equals("RSA/ECB/PKCS1Padding")){
+            else if(algorithm.equals("RSA/ECB/NoPadding")){
                 cipher.init(Cipher.DECRYPT_MODE,secretKey);
             }
 
             decryptedByte =cipher.doFinal(encryptedText);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : DECRYPTION:"+e);
+
         } catch (InvalidKeyException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : DECRYPTION:"+e);
         } catch (InvalidAlgorithmParameterException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : DECRYPTION:"+e);
         } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : DECRYPTION:"+e);
         } catch (BadPaddingException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : DECRYPTION:"+e);
         } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
+            System.out.println("ERROR : DECRYPTION:"+e);
         }
 
         return decryptedByte;
@@ -158,7 +159,7 @@ public class Encryption {
         signature.initSign(privateKey);
         signature.update(secretKey.getEncoded());
         TextSigned = signature.sign();
-        return encoder.encodeToString(TextSigned);
+        return Base64.getEncoder().encodeToString(TextSigned);
     }
 
     public boolean isSigned(PublicKey pubKey, Key key, String data) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {

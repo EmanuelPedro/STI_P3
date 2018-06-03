@@ -156,13 +156,13 @@ public class ChatClient implements Runnable
         //SecretKey secret = Encryption.getSecret();
         clientSecretKey =  Encryption.getSecret();
         System.out.println("CLIENTSECRET:"+clientSecretKey.getEncoded().length);
-        byte[] encryptPublicKey = encryption.encrypt2(clientSecretKey.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/PKCS1Padding");
+        byte[] encryptPublicKey = encryption.encrypt2(clientSecretKey.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/NoPadding");
         String clientSecretKeyText = Base64.getEncoder().encodeToString(clientSecretKey.getEncoded());
 
         streamOut.writeUTF(clientSecretKeyText);
         //System.out.println("Symetric Key sent! ");
         ////// TEST encrypt using String
-        // String encryptPublicKeyText = encryption.encrypt(Base64.getEncoder().encodeToString(secret.getEncoded()), serverCertificate.getPublicKey(), "RSA");
+        // String encryptPublicKeyText = encryption.encrypt(Base64.getEncoder().encodeToString(secret.getEncoded()), serverCertificate.getPublicKey(), "AES");
         // System.out.println("\n ==> encryptPublicKeyText = " + encryptPublicKeyText);
         //////////////////////////////////////////
 

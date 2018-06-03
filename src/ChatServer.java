@@ -185,19 +185,19 @@ public class ChatServer implements Runnable
         byte[] decryptWithPrivateKey = new byte[0];
         boolean isSigned = false;
         try {
-            decryptWithPrivateKey = encryption.decrypt2(publicKey.getBytes(), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/PKCS1Padding");
+            decryptWithPrivateKey = encryption.decrypt2(Base64.getDecoder().decode(publicKey.getBytes()), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/NoPadding");
         } catch (Exception e) {
             System.out.println("ERROR ON DECRYPT" + e);
             clients[leaving_id].send(".quit");
             remove(ID);
-            System.exit(0);
+
 
         }
 
         clients[leaving_id].setClientSecretKey(decryptWithPrivateKey);
         //set client secretKey
-        SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
-        clients[leaving_id].setSecretKey(secretKey);
+//        SecretKeySpec secretKey = new SecretKeySpec(decryptWithPrivateKey, "AES");
+  //      clients[leaving_id].setSecretKey(secretKey);
 
         // verify signature
         //boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
@@ -210,7 +210,7 @@ public class ChatServer implements Runnable
             myVerifySign = Signature.getInstance("SHA256withRSA");
             myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
             myVerifySign.update(clients[leaving_id].getSecretKey().getEncoded());
-            isSigned = myVerifySign.verify(signature.getBytes());
+            isSigned = myVerifySign.verify(Base64.getDecoder().decode(signature));
             if (isSigned) {
                 System.out.println("Signature valid! ");
                 afterSign(ID,certificate,encryption,publicKey,leaving_id,signature,message);
@@ -317,6 +317,8 @@ public class ChatServer implements Runnable
 			catch(IOException ioe)
 			{
 				System.out.println("Error closing thread: " + ioe);
+
+
 			}
 
 			toTerminate.stop();
@@ -404,6 +406,7 @@ class ChatServerThread extends Thread
 			System.out.println(ID + " ERROR sending message: " + ioexception.getMessage());
 			server.remove(ID);
 			stop();
+
 		}
 	}
 
@@ -438,6 +441,7 @@ class ChatServerThread extends Thread
 			return true;
 		} catch (CertificateException e){
 			System.out.println("Certificate error.");
+
 			return false;
 		}
 	}
@@ -467,6 +471,8 @@ class ChatServerThread extends Thread
 				stop();
 			} catch (Exception e) {
 				e.printStackTrace();
+				server.remove(ID);
+				stop();
 			}
 		}
 	}
