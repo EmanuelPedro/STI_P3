@@ -130,7 +130,8 @@ public class ChatClient implements Runnable
         //String encryptMessageText =encryptMessage.toString();
         //System.out.println(">>>>>>>>>SENDSIGNATURE"+new String(Base64.getDecoder().decode(encryptMessageText),StandardCharsets.UTF_16));
         //System.out.println(">>>>>>>>>SENDSIGNATURE"+(Base64.getDecoder().decode(encryptMessageText)));
-        System.out.println(encryptMessageText);
+        //System.out.println("1>>>"+encryptMessage);
+        //System.out.println("2>>>"+encryptMessageText);
         streamOut.writeUTF(encryptMessageText);
 //        streamOut.flush();
         readEncrMessage(message,encryption);

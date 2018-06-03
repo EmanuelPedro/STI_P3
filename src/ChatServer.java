@@ -207,8 +207,11 @@ public class ChatServer implements Runnable
             myVerifySign = Signature.getInstance("SHA256withRSA");
             myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
             myVerifySign.update(clients[leaving_id].getSecretKey().getEncoded());
-
-            boolean isSigned = myVerifySign.verify(Base64.getDecoder().decode(signature));
+            System.out.println("1INSIDE"+signature);
+            System.out.println("1INSIDE"+Base64.getEncoder().encode(signature.getBytes()));
+            byte[] decSig = Base64.getDecoder().decode(signature.getBytes());
+            //boolean isSigned = myVerifySign.verify(Base64.getDecoder().decode(signature));
+            boolean isSigned = myVerifySign.verify(decSig);
             if (isSigned) {
                 System.out.println("Signature valid! ");
                 afterSign(ID,certificate,encryption,publicKey,leaving_id,signature,message);
@@ -459,7 +462,7 @@ class ChatServerThread extends Thread
 	public void run()
 	{
 		System.out.println("Server Thread " + ID + " running.");
-		String message, certificate, publicKey, signature;
+		String message, certificate, publicKey, signature=null;
 
 		while (true)
 		{
@@ -468,10 +471,10 @@ class ChatServerThread extends Thread
 				certificate = streamIn.readUTF();
 				publicKey = streamIn.readUTF();
 				signature = streamIn.readUTF();
-               // System.out.println("3"+Base64.getDecoder().decode(signature));
-                //System.out.println("4"+signature);
+               System.out.println("3"+Base64.getDecoder().decode(signature));
+                System.out.println("4"+signature);
 				message= streamIn.readUTF();
-                System.out.println("4"+message.toString());
+                System.out.println("5"+message.toString());
 
 				server.handle(ID, certificate, publicKey, signature, message);
 			}

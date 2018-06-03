@@ -11,9 +11,10 @@ public class Encryption {
     private Cipher cipher = null;
     private SecretKeySpec secret;
     private String defaultPass = "PasswordForSTIP3";
-    public Base64.Encoder encoder;
-    public Base64.Decoder decoder;
+    public Base64.Encoder encoder=null;
+    public Base64.Decoder decoder=null;
     static KeyGenerator keyGen;
+
 
     public Encryption()
     {
@@ -150,6 +151,14 @@ public class Encryption {
         }
 
         return decryptedByte;
+    }
+
+    public String encodeBase64(byte[] data){
+        return encoder.encodeToString(data);
+    }
+
+    public byte[] decodeBase64(String data){
+        return decoder.decode(data);
     }
 
 }
