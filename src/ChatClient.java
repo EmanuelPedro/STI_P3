@@ -3,6 +3,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.*;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.cert.CertificateException;
@@ -25,7 +26,6 @@ public class ChatClient implements Runnable
     SecretKey clientSecretKey = null;
     String keyPass = null;
     String keyAlias = null;
-
 
     public ChatClient(String serverName, int serverPort, String certname, String servercertname, String keystorename, String keystorepass, String keystorealias) {
         System.out.println("Establishing connection to server...");
@@ -125,9 +125,14 @@ public class ChatClient implements Runnable
         signature.update(clientSecretKey.getEncoded());
         byte[] TextSigned = signature.sign();
         byte[] encryptMessage = encryption.encrypt2(TextSigned, clientSecretKey, "AES");
-        String encryptMessageText = Base64.getEncoder().encodeToString(encryptMessage);
-        System.out.println(">>>>>>>>>SENDSIGNATURE"+TextSigned);
+
+        String encryptMessageText =Base64.getEncoder().encodeToString(encryptMessage);
+        //String encryptMessageText =encryptMessage.toString();
+        //System.out.println(">>>>>>>>>SENDSIGNATURE"+new String(Base64.getDecoder().decode(encryptMessageText),StandardCharsets.UTF_16));
+        //System.out.println(">>>>>>>>>SENDSIGNATURE"+(Base64.getDecoder().decode(encryptMessageText)));
+        System.out.println(encryptMessageText);
         streamOut.writeUTF(encryptMessageText);
+//        streamOut.flush();
         readEncrMessage(message,encryption);
     }
     public void readEncrMessage(String message,Encryption encryption) throws IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, InvalidKeyException, SignatureException {
@@ -157,7 +162,6 @@ public class ChatClient implements Runnable
         // 2. envia chave simetrica encriptada com chave publica do servidor
         //SecretKey secret = Encryption.getSecret();
         clientSecretKey =  Encryption.getSecret();
-        System.out.println("CLIENTSECRET:"+clientSecretKey.getEncoded().length);
         byte[] encryptPublicKey = encryption.encrypt2(clientSecretKey.getEncoded(), serverCertificate.getPublicKey(), "RSA/ECB/NoPadding");
         String clientSecretKeyText = Base64.getEncoder().encodeToString(clientSecretKey.getEncoded());
 
@@ -230,11 +234,7 @@ public class ChatClient implements Runnable
                         System.out.println("Exiting...Please press RETURN to exit ...");
                         stop();
                     }
-                    if(sendedMessage.equals(".renovatingKey")){
-                        System.out.println("[ALERT]RENOVATING KEY");
-                       // sendSimmetricKeys(message,encryption);
 
-                    }
                     else
                         System.out.println(sendedMessageID);
                 } else {

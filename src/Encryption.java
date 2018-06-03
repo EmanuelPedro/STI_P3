@@ -63,8 +63,8 @@ public class Encryption {
         //SecretKeySpec secKey = new SecretKeySpec(secretKey, algorithm);
 
         cipher = Cipher.getInstance(algorithm);
-        System.out.println("Length data encrypt = " + plainText.length());
-        System.out.println("Length key encrypt = " + secretKey.getEncoded().length);
+      //  System.out.println("Length data encrypt = " + plainText.length());
+        //System.out.println("Length key encrypt = " + secretKey.getEncoded().length);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         byte[] newData = cipher.doFinal(plainText.getBytes());
 
@@ -86,8 +86,8 @@ public class Encryption {
         //System.out.println("Valor de plaintext = " + encoder.encodeToString(plainText));    // byte -> string
         //System.out.println("Valor de key = " + encoder.encodeToString(secretKey.getEncoded()));     //key -> string
         byte[] encryptedByte = new byte[200];
-        System.out.println("Length data encrypt = " + plainText.length);
-        System.out.println("Length key encrypt = " + secretKey2.getEncoded().length);
+     //   System.out.println("Length data encrypt = " + plainText.length);
+       // System.out.println("Length key encrypt = " + secretKey2.getEncoded().length);
 
         try {
             cipher = Cipher.getInstance(algorithm);
@@ -121,8 +121,8 @@ public class Encryption {
     public byte[] decrypt2(byte[] encryptedText, Key secretKey, String algorithm) {
         //String s = new String(encryptedText,StandardCharsets.UTF_8);
         //System.out.println("Valor de encryptedText = " + encoder.encodeToString(encryptedText));
-        System.out.println("Length data decrypt = " + encryptedText.length);
-        System.out.println("Length key decrypt = " + secretKey.getEncoded().length);
+       // System.out.println("Length data decrypt = " + encryptedText.length);
+        //System.out.println("Length key decrypt = " + secretKey.getEncoded().length);
         byte[] decryptedByte = new byte[200];
         try{
            cipher = Cipher.getInstance(algorithm);

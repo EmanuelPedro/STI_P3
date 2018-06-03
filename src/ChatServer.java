@@ -51,6 +51,7 @@ public class ChatServer implements Runnable
 		}
 		KeyStore keystore = null;
 		try {
+            System.out.println("keystore"+ KeyStore.getDefaultType());
 			keystore = KeyStore.getInstance("JCEKS");
 			keystore.load(is, password.toCharArray());
 			return keystore;
@@ -170,12 +171,6 @@ public class ChatServer implements Runnable
 			if (isCertValid) {
 				System.out.println("cert valid");
 			    goToDecrypt(ID,certificate,encryption,publicKey,leaving_id,signature,message);
-			    //Renovar chaves
-                if (clients[leaving_id].getSentMessages()% 5 == 0){
-                    String renewMessage = ".renovatingKey";
-                    //clients[leaving_id].send(encryption.encrypt(renewMessage.getBytes(), clients[leaving_id].getSecretKey(), "AES"));
-
-                }
 			}
 			else{
 				System.out.println("Cert not valid");
@@ -189,7 +184,6 @@ public class ChatServer implements Runnable
     public synchronized void goToDecrypt(int ID, String certificate,Encryption encryption,String publicKey,int leaving_id,String signature,String message) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 
         byte[] decryptWithPrivateKey = new byte[0];
-
         try {
             decryptWithPrivateKey = encryption.decrypt2(Base64.getDecoder().decode(publicKey.getBytes()), keystore.getKey(keystorealias, keystorepass.toCharArray()), "RSA/ECB/NoPadding");
         } catch (Exception e) {
@@ -209,18 +203,11 @@ public class ChatServer implements Runnable
         //boolean isSigned = encryption.isSigned(clients[leaving_id].getClientCertificate().getPublicKey(), clients[leaving_id].getSecretKey(), signature);
         Signature myVerifySign = null;
         try {
-            System.out.println("1>>Signature length = " + signature.getBytes().length);
-
-
-            System.out.println("Signature = " + Base64.getDecoder().decode(signature));
+        //  System.out.println("Signature = " + new String(Base64.getDecoder().decode(signature.getBytes(StandardCharsets.UTF_16))));
             myVerifySign = Signature.getInstance("SHA256withRSA");
-
-
-			System.out.println("CLIENTPUBLCKEY"+clients[leaving_id].getClientCertificate().getPublicKey());
             myVerifySign.initVerify(clients[leaving_id].getClientCertificate().getPublicKey());
-			System.out.println("MYVERIFYSIGN:"+clients[leaving_id].getClientSecretKey());
             myVerifySign.update(clients[leaving_id].getSecretKey().getEncoded());
-            System.out.println("SIGNSERVER:"+signature);
+
             boolean isSigned = myVerifySign.verify(Base64.getDecoder().decode(signature));
             if (isSigned) {
                 System.out.println("Signature valid! ");
@@ -303,7 +290,7 @@ public class ChatServer implements Runnable
 				remove(ID);
 
             }
-//TODO RENEW KEY
+
 
 }
 	public synchronized void remove(int ID)
@@ -395,6 +382,7 @@ class ChatServerThread extends Thread
 	private SecretKeySpec secretKey;
 	private byte[] ClientSecretKey;
 
+
     public int getSentMessages() {
         return sentMessages;
     }
@@ -480,8 +468,10 @@ class ChatServerThread extends Thread
 				certificate = streamIn.readUTF();
 				publicKey = streamIn.readUTF();
 				signature = streamIn.readUTF();
-
+               // System.out.println("3"+Base64.getDecoder().decode(signature));
+                //System.out.println("4"+signature);
 				message= streamIn.readUTF();
+                System.out.println("4"+message.toString());
 
 				server.handle(ID, certificate, publicKey, signature, message);
 			}
